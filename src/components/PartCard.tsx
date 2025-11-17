@@ -1,7 +1,7 @@
 import { Part } from "@/types/part";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Package, DollarSign, Star, History } from "lucide-react";
+import { MapPin, Package, DollarSign, History } from "lucide-react";
 
 interface PartCardProps {
   part: Part;
@@ -62,10 +62,8 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm">
-          <Star className="h-4 w-4 text-warning fill-warning" />
-          <span className="text-foreground">{part.vendor.rating}</span>
-          <span className="text-muted-foreground text-xs">({part.vendor.name})</span>
+        <div className="text-sm text-muted-foreground">
+          {part.vendor.name}
         </div>
         {part.inStock ? (
           <div className="flex items-center gap-1">
