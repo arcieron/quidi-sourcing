@@ -60,10 +60,6 @@ export const mockParts: Part[] = [
     location: "Warehouse B - Bay 7",
     matchScore: 95,
     schematics: "Standard ball bearing with corrosion-resistant coating",
-    orderHistory: [
-      { date: "2024-02-01", quantity: 80, price: 140.00, vendor: "Global Bearings Inc.", division: "Assembly" },
-      { date: "2024-01-20", quantity: 120, price: 139.50, vendor: "Global Bearings Inc.", division: "Manufacturing" }
-    ],
     additionalMetadata: {
       weight: 0.34,
       grade: "ABEC-5",
@@ -92,9 +88,6 @@ export const mockParts: Part[] = [
     location: "Warehouse C - Bay 2",
     matchScore: 88,
     schematics: "Chrome steel bearing for standard industrial use",
-    orderHistory: [
-      { date: "2023-12-15", quantity: 50, price: 128.00, vendor: "Industrial Supply Ltd.", division: "Maintenance" }
-    ],
     additionalMetadata: {
       weight: 0.38,
       grade: "ABEC-3",
@@ -153,9 +146,6 @@ export const mockParts: Part[] = [
     location: "Warehouse A - Bay 5",
     matchScore: 79,
     schematics: "Heavy load capacity bearing for industrial machinery",
-    orderHistory: [
-      { date: "2024-01-25", quantity: 30, price: 170.00, vendor: "Precision Parts Co.", division: "Manufacturing" }
-    ],
     additionalMetadata: {
       weight: 0.42,
       grade: "ABEC-9",
