@@ -1,7 +1,7 @@
 import { Part } from "@/types/part";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Package, DollarSign, Star } from "lucide-react";
+import { MapPin, Package, DollarSign, Star, History } from "lucide-react";
 
 interface PartCardProps {
   part: Part;
@@ -23,7 +23,15 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
-          <h3 className="font-semibold text-foreground">{part.partNumber}</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold text-foreground">{part.partNumber}</h3>
+            {part.orderHistory && part.orderHistory.length > 0 && (
+              <Badge variant="outline" className="text-primary border-primary">
+                <History className="h-3 w-3 mr-1" />
+                Previously Ordered
+              </Badge>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground line-clamp-1">{part.description}</p>
         </div>
         <Badge className={getMatchColor(part.matchScore)}>
