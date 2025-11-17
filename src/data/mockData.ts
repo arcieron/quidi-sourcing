@@ -1,4 +1,8 @@
 import { Part, SearchHistory } from "@/types/part";
+import bearing1 from "@/assets/bearing-1.jpg";
+import bearing2 from "@/assets/bearing-2.jpg";
+import bearing3 from "@/assets/bearing-3.jpg";
+import bearing4 from "@/assets/bearing-4.jpg";
 
 export const mockParts: Part[] = [
   {
@@ -6,6 +10,7 @@ export const mockParts: Part[] = [
     partNumber: "BRG-4521-A",
     description: "High-precision ball bearing, stainless steel",
     material: "Stainless Steel 316",
+    imageUrl: bearing1,
     dimensions: {
       length: 50,
       width: 50,
@@ -38,6 +43,7 @@ export const mockParts: Part[] = [
     partNumber: "BRG-4521-B",
     description: "Ball bearing, stainless steel, alternate supplier",
     material: "Stainless Steel 316",
+    imageUrl: bearing2,
     dimensions: {
       length: 50,
       width: 50,
@@ -69,6 +75,7 @@ export const mockParts: Part[] = [
     partNumber: "BRG-4520-C",
     description: "Ball bearing, chrome steel, similar dimensions",
     material: "Chrome Steel",
+    imageUrl: bearing3,
     dimensions: {
       length: 52,
       width: 52,
@@ -99,6 +106,7 @@ export const mockParts: Part[] = [
     partNumber: "BRG-4519-D",
     description: "Sealed ball bearing, stainless steel",
     material: "Stainless Steel 304",
+    imageUrl: bearing2,
     dimensions: {
       length: 48,
       width: 48,
@@ -128,6 +136,7 @@ export const mockParts: Part[] = [
     partNumber: "BRG-4522-E",
     description: "Heavy-duty ball bearing, stainless steel",
     material: "Stainless Steel 316L",
+    imageUrl: bearing4,
     dimensions: {
       length: 50,
       width: 50,

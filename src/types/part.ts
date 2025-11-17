@@ -18,6 +18,7 @@ export interface Part {
   quantity: number;
   location?: string;
   matchScore: number;
+  imageUrl?: string;
   orderHistory?: OrderHistoryItem[];
   schematics?: string;
   additionalMetadata?: {
