@@ -1,5 +1,6 @@
 import { Part } from "@/types/part";
 import PartCard from "./PartCard";
+import ExactMatchSection from "./ExactMatchSection";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Package } from "lucide-react";
 
@@ -9,8 +10,10 @@ interface ResultsSectionProps {
 }
 
 const ResultsSection = ({ parts, onSelectPart }: ResultsSectionProps) => {
-  const inStockParts = parts.filter(p => p.inStock);
-  const outOfStockParts = parts.filter(p => !p.inStock);
+  const exactMatch = parts.find(p => p.matchScore >= 98);
+  const otherParts = parts.filter(p => p.matchScore < 98);
+  const inStockParts = otherParts.filter(p => p.inStock);
+  const outOfStockParts = otherParts.filter(p => !p.inStock);
 
   if (parts.length === 0) {
     return (
@@ -26,6 +29,14 @@ const ResultsSection = ({ parts, onSelectPart }: ResultsSectionProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Exact Match Section */}
+      {exactMatch && (
+        <ExactMatchSection
+          part={exactMatch}
+          onClick={() => onSelectPart(exactMatch)}
+        />
+      )}
+
       {/* In Stock Section */}
       {inStockParts.length > 0 && (
         <div>
