@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Header from "@/components/Header";
 import SearchSidebar from "@/components/SearchSidebar";
 import SearchInterface from "@/components/SearchInterface";
 import ResultsSection from "@/components/ResultsSection";
@@ -45,23 +46,27 @@ const Index = () => {
   };
 
   return (
-    <div className="flex h-screen bg-background">
-      <SearchSidebar 
-        history={searchHistory}
-        onSelectHistory={handleSelectHistory}
-      />
+    <div className="flex flex-col h-screen bg-background">
+      <Header />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <SearchInterface onSearch={handleSearch} />
+      <div className="flex flex-1 overflow-hidden">
+        <SearchSidebar 
+          history={searchHistory}
+          onSelectHistory={handleSelectHistory}
+        />
         
-        <ScrollArea className="flex-1">
-          <div className="max-w-6xl mx-auto p-6">
-            <ResultsSection 
-              parts={searchResults}
-              onSelectPart={handleSelectPart}
-            />
-          </div>
-        </ScrollArea>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <SearchInterface onSearch={handleSearch} />
+        
+          <ScrollArea className="flex-1">
+            <div className="max-w-6xl mx-auto p-6">
+              <ResultsSection 
+                parts={searchResults}
+                onSelectPart={handleSelectPart}
+              />
+            </div>
+          </ScrollArea>
+        </div>
       </div>
 
       <PartDetailDialog

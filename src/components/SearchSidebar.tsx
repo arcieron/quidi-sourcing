@@ -10,7 +10,7 @@ interface SearchSidebarProps {
 
 const SearchSidebar = ({ history, onSelectHistory }: SearchSidebarProps) => {
   return (
-    <div className="w-64 border-r border-border bg-card h-screen flex flex-col">
+    <div className="w-64 border-r border-border bg-card h-full flex flex-col">
       <div className="p-4 border-b border-border">
         <h2 className="font-semibold text-card-foreground flex items-center gap-2">
           <Clock className="h-4 w-4" />
