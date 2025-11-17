@@ -68,7 +68,7 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
         {part.inStock ? (
           <div className="flex items-center gap-1">
             <Badge variant="outline" className="text-success border-success">
-              In Stock ({part.quantity})
+              Company Stock: {part.quantity}
             </Badge>
             {part.location && (
               <MapPin className="h-3 w-3 text-success" />
@@ -76,7 +76,7 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
           </div>
         ) : (
           <Badge variant="outline" className="text-muted-foreground">
-            Out of Stock
+            Not in Company Stock
           </Badge>
         )}
       </div>
