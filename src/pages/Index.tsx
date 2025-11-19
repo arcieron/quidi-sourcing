@@ -4,6 +4,7 @@ import SearchSidebar from "@/components/SearchSidebar";
 import SearchInterface from "@/components/SearchInterface";
 import ResultsSection from "@/components/ResultsSection";
 import PartDetailDialog from "@/components/PartDetailDialog";
+import DrillDownChat from "@/components/DrillDownChat";
 import { Part, SearchHistory } from "@/types/part";
 import { mockParts, mockSearchHistory } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
@@ -45,6 +46,10 @@ const Index = () => {
     setIsDialogOpen(true);
   };
 
+  const handleRefineSearch = (query: string) => {
+    handleSearch(query);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-background">
       <Header />
@@ -59,13 +64,17 @@ const Index = () => {
           <SearchInterface onSearch={handleSearch} />
         
           <ScrollArea className="flex-1">
-            <div className="max-w-6xl mx-auto p-6">
+            <div className="max-w-6xl mx-auto p-6 pb-24">
               <ResultsSection 
                 parts={searchResults}
                 onSelectPart={handleSelectPart}
               />
             </div>
           </ScrollArea>
+
+          {searchResults.length > 0 && (
+            <DrillDownChat onRefine={handleRefineSearch} />
+          )}
         </div>
       </div>
 
