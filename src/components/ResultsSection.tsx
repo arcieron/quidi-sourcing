@@ -46,7 +46,7 @@ const ResultsSection = ({ parts, onSelectPart }: ResultsSectionProps) => {
             </h2>
           </div>
           <Alert className="mb-4 bg-success/10 border-success">
-            <AlertDescription className="text-success-foreground">
+            <AlertDescription className="text-foreground">
               {inStockParts.reduce((sum, p) => sum + p.quantity, 0)} total units available across {inStockParts.length} matching parts
             </AlertDescription>
           </Alert>
