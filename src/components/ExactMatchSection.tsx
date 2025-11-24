@@ -120,16 +120,16 @@ const ExactMatchSection = ({ part, onClick }: ExactMatchSectionProps) => {
                               <div className="font-semibold text-sm border-b border-border pb-1">{order.vendor}</div>
                               {part.vendor.name === order.vendor && (
                                 <>
-                                  {part.vendor.shippingTime && (
-                                    <div className="flex items-center gap-2 text-xs">
-                                      <Truck className="h-3 w-3" />
-                                      <span>Shipping: {part.vendor.shippingTime}</span>
-                                    </div>
-                                  )}
                                   {part.vendor.qualityScore && (
                                     <div className="flex items-center gap-2 text-xs">
                                       <Award className="h-3 w-3" />
                                       <span>Quality Score: {part.vendor.qualityScore}%</span>
+                                    </div>
+                                  )}
+                                  {part.vendor.shippingTime && (
+                                    <div className="flex items-center gap-2 text-xs">
+                                      <Truck className="h-3 w-3" />
+                                      <span>Average Shipping Time: {part.vendor.shippingTime}</span>
                                     </div>
                                   )}
                                   {part.vendor.priceHistory && part.vendor.priceHistory.length > 0 && (
