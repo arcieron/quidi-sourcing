@@ -20,7 +20,7 @@ export const mockParts: Part[] = [
     vendor: {
       name: "Precision Parts Co.",
       rating: 4.8,
-      shippingTime: "2-3 business days",
+      shippingTime: "2.5 days",
       qualityScore: 96,
       priceHistory: [
         { date: "2024-01", price: 150.00 },
@@ -67,7 +67,7 @@ export const mockParts: Part[] = [
     vendor: {
       name: "Global Bearings Inc.",
       rating: 4.5,
-      shippingTime: "3-5 business days",
+      shippingTime: "4.1 days",
       qualityScore: 88,
       priceHistory: [
         { date: "2024-01", price: 138.75 },
@@ -108,7 +108,7 @@ export const mockParts: Part[] = [
     vendor: {
       name: "Industrial Supply Ltd.",
       rating: 4.2,
-      shippingTime: "5-7 business days",
+      shippingTime: "6.3 days",
       qualityScore: 82,
       priceHistory: [
         { date: "2024-01", price: 125.00 },
@@ -149,7 +149,7 @@ export const mockParts: Part[] = [
     vendor: {
       name: "Quality Components Corp.",
       rating: 4.6,
-      shippingTime: "1-2 business days",
+      shippingTime: "1.5 days",
       qualityScore: 91,
       priceHistory: [
         { date: "2024-01", price: 132.90 },
@@ -192,7 +192,7 @@ export const mockParts: Part[] = [
     vendor: {
       name: "Precision Parts Co.",
       rating: 4.8,
-      shippingTime: "2-3 business days",
+      shippingTime: "2.5 days",
       qualityScore: 96,
       priceHistory: [
         { date: "2024-01", price: 168.00 },
