@@ -45,9 +45,26 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
           </div>
           <p className="text-sm text-muted-foreground line-clamp-1">{part.description}</p>
         </div>
-        <Badge className={getMatchColor(part.matchScore)}>
-          {part.matchScore}% Match
-        </Badge>
+        {part.matchBreakdown && (
+          <div className="flex flex-col gap-1 items-end">
+            <div className="flex gap-1.5">
+              <Badge variant="outline" className="text-xs">
+                Size: {part.matchBreakdown.size}%
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                Material: {part.matchBreakdown.material}%
+              </Badge>
+            </div>
+            <div className="flex gap-1.5">
+              <Badge variant="outline" className="text-xs">
+                Grade: {part.matchBreakdown.grade}%
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                Specs: {part.matchBreakdown.specifications}%
+              </Badge>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-3 mb-3">

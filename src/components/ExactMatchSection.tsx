@@ -21,9 +21,14 @@ const ExactMatchSection = ({ part, onClick }: ExactMatchSectionProps) => {
     <div className="mb-8">
       <div className="flex items-center gap-2 mb-4">
         <h2 className="text-2xl font-bold text-foreground">Exact Match</h2>
-        <Badge className="bg-success text-success-foreground">
-          {part.matchScore}% Match
-        </Badge>
+        {part.matchBreakdown && (
+          <div className="flex gap-2">
+            <Badge variant="outline">Size: {part.matchBreakdown.size}%</Badge>
+            <Badge variant="outline">Material: {part.matchBreakdown.material}%</Badge>
+            <Badge variant="outline">Grade: {part.matchBreakdown.grade}%</Badge>
+            <Badge variant="outline">Specs: {part.matchBreakdown.specifications}%</Badge>
+          </div>
+        )}
       </div>
       
       <Card className="p-6 border-success/50 shadow-lg cursor-pointer hover:shadow-xl transition-shadow" onClick={onClick}>
