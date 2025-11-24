@@ -18,6 +18,12 @@ export interface Part {
   quantity: number;
   location?: string;
   matchScore: number;
+  matchBreakdown?: {
+    size: number;
+    material: number;
+    grade: number;
+    specifications: number;
+  };
   imageUrl?: string;
   orderHistory?: OrderHistoryItem[];
   schematics?: string;

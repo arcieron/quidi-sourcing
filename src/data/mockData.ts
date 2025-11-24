@@ -26,6 +26,12 @@ export const mockParts: Part[] = [
     quantity: 250,
     location: "Warehouse A - Bay 3",
     matchScore: 98,
+    matchBreakdown: {
+      size: 100,
+      material: 100,
+      grade: 98,
+      specifications: 95
+    },
     schematics: "Ball bearing with sealed design for high-load applications",
     orderHistory: [
       { date: "2024-01-15", quantity: 100, price: 150.00, vendor: "Precision Parts Co.", division: "Manufacturing" },
@@ -59,6 +65,12 @@ export const mockParts: Part[] = [
     quantity: 180,
     location: "Warehouse B - Bay 7",
     matchScore: 95,
+    matchBreakdown: {
+      size: 100,
+      material: 100,
+      grade: 85,
+      specifications: 95
+    },
     schematics: "Standard ball bearing with corrosion-resistant coating",
     additionalMetadata: {
       weight: 0.34,
@@ -87,6 +99,12 @@ export const mockParts: Part[] = [
     quantity: 95,
     location: "Warehouse C - Bay 2",
     matchScore: 88,
+    matchBreakdown: {
+      size: 95,
+      material: 75,
+      grade: 70,
+      specifications: 90
+    },
     schematics: "Chrome steel bearing for standard industrial use",
     additionalMetadata: {
       weight: 0.38,
@@ -114,6 +132,12 @@ export const mockParts: Part[] = [
     inStock: false,
     quantity: 0,
     matchScore: 82,
+    matchBreakdown: {
+      size: 90,
+      material: 85,
+      grade: 75,
+      specifications: 80
+    },
     schematics: "Sealed design for wet environments",
     orderHistory: [
       { date: "2023-10-30", quantity: 60, price: 135.00, vendor: "Quality Components Corp.", division: "Assembly" }
@@ -145,6 +169,12 @@ export const mockParts: Part[] = [
     quantity: 45,
     location: "Warehouse A - Bay 5",
     matchScore: 79,
+    matchBreakdown: {
+      size: 98,
+      material: 95,
+      grade: 60,
+      specifications: 65
+    },
     schematics: "Heavy load capacity bearing for industrial machinery",
     additionalMetadata: {
       weight: 0.42,
