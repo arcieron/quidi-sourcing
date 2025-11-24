@@ -1,7 +1,13 @@
 import { Part } from "@/types/part";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Package, DollarSign, Building2, History, Clock } from "lucide-react";
+import { MapPin, Package, DollarSign, Building2, History, Clock, Truck, Award, TrendingUp } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Table,
   TableBody,
@@ -101,10 +107,52 @@ const ExactMatchSection = ({ part, onClick }: ExactMatchSectionProps) => {
                 {part.orderHistory.map((order, index) => (
                   <TableRow key={index}>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{order.vendor}</span>
-                      </div>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex items-center gap-2 cursor-help">
+                              <Building2 className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium hover:text-foreground transition-colors">{order.vendor}</span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <div className="space-y-2">
+                              <div className="font-semibold text-sm border-b border-border pb-1">{order.vendor}</div>
+                              {part.vendor.name === order.vendor && (
+                                <>
+                                  {part.vendor.shippingTime && (
+                                    <div className="flex items-center gap-2 text-xs">
+                                      <Truck className="h-3 w-3" />
+                                      <span>Shipping: {part.vendor.shippingTime}</span>
+                                    </div>
+                                  )}
+                                  {part.vendor.qualityScore && (
+                                    <div className="flex items-center gap-2 text-xs">
+                                      <Award className="h-3 w-3" />
+                                      <span>Quality Score: {part.vendor.qualityScore}%</span>
+                                    </div>
+                                  )}
+                                  {part.vendor.priceHistory && part.vendor.priceHistory.length > 0 && (
+                                    <div className="text-xs">
+                                      <div className="flex items-center gap-2 mb-1">
+                                        <TrendingUp className="h-3 w-3" />
+                                        <span className="font-medium">Price History:</span>
+                                      </div>
+                                      <div className="pl-5 space-y-0.5">
+                                        {part.vendor.priceHistory.slice(0, 3).map((history, idx) => (
+                                          <div key={idx} className="text-muted-foreground">
+                                            {history.date}: ${history.price.toFixed(2)}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1 text-muted-foreground">

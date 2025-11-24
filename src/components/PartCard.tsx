@@ -1,7 +1,13 @@
 import { Part } from "@/types/part";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Package, DollarSign, History } from "lucide-react";
+import { MapPin, Package, DollarSign, History, TrendingUp, Truck, Award } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PartCardProps {
   part: Part;
@@ -79,9 +85,47 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
       </div>
 
       <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {part.vendor.name}
-        </div>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="text-sm text-muted-foreground cursor-help hover:text-foreground transition-colors">
+                {part.vendor.name}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">
+              <div className="space-y-2">
+                <div className="font-semibold text-sm border-b border-border pb-1">{part.vendor.name}</div>
+                {part.vendor.shippingTime && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <Truck className="h-3 w-3" />
+                    <span>Shipping: {part.vendor.shippingTime}</span>
+                  </div>
+                )}
+                {part.vendor.qualityScore && (
+                  <div className="flex items-center gap-2 text-xs">
+                    <Award className="h-3 w-3" />
+                    <span>Quality Score: {part.vendor.qualityScore}%</span>
+                  </div>
+                )}
+                {part.vendor.priceHistory && part.vendor.priceHistory.length > 0 && (
+                  <div className="text-xs">
+                    <div className="flex items-center gap-2 mb-1">
+                      <TrendingUp className="h-3 w-3" />
+                      <span className="font-medium">Price History:</span>
+                    </div>
+                    <div className="pl-5 space-y-0.5">
+                      {part.vendor.priceHistory.slice(0, 3).map((history, idx) => (
+                        <div key={idx} className="text-muted-foreground">
+                          {history.date}: ${history.price.toFixed(2)}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         {part.inStock ? (
           <div className="flex items-center gap-1">
             <Badge variant="outline" className="text-success border-success">

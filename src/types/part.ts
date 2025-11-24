@@ -12,6 +12,12 @@ export interface Part {
   vendor: {
     name: string;
     rating: number;
+    shippingTime?: string;
+    qualityScore?: number;
+    priceHistory?: {
+      date: string;
+      price: number;
+    }[];
   };
   price: number;
   inStock: boolean;

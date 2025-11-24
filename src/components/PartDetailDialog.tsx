@@ -7,7 +7,13 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Package, Ruler, DollarSign, Star, MapPin, Box, Award } from "lucide-react";
+import { Package, Ruler, DollarSign, Star, MapPin, Box, Award, Truck, TrendingUp } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Table,
   TableBody,
@@ -62,11 +68,49 @@ const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) =
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Vendor</p>
-                <p className="font-medium flex items-center gap-1">
-                  {part.vendor.name}
-                  <Star className="h-3 w-3 text-warning fill-warning ml-1" />
-                  {part.vendor.rating}
-                </p>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <p className="font-medium flex items-center gap-1 cursor-help hover:text-foreground transition-colors">
+                        {part.vendor.name}
+                        <Star className="h-3 w-3 text-warning fill-warning ml-1" />
+                        {part.vendor.rating}
+                      </p>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <div className="space-y-2">
+                        <div className="font-semibold text-sm border-b border-border pb-1">{part.vendor.name}</div>
+                        {part.vendor.shippingTime && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <Truck className="h-3 w-3" />
+                            <span>Shipping: {part.vendor.shippingTime}</span>
+                          </div>
+                        )}
+                        {part.vendor.qualityScore && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <Award className="h-3 w-3" />
+                            <span>Quality Score: {part.vendor.qualityScore}%</span>
+                          </div>
+                        )}
+                        {part.vendor.priceHistory && part.vendor.priceHistory.length > 0 && (
+                          <div className="text-xs">
+                            <div className="flex items-center gap-2 mb-1">
+                              <TrendingUp className="h-3 w-3" />
+                              <span className="font-medium">Price History:</span>
+                            </div>
+                            <div className="pl-5 space-y-0.5">
+                              {part.vendor.priceHistory.slice(0, 3).map((history, idx) => (
+                                <div key={idx} className="text-muted-foreground">
+                                  {history.date}: ${history.price.toFixed(2)}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Stock Status</p>

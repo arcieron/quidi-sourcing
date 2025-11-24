@@ -19,7 +19,15 @@ export const mockParts: Part[] = [
     },
     vendor: {
       name: "Precision Parts Co.",
-      rating: 4.8
+      rating: 4.8,
+      shippingTime: "2-3 business days",
+      qualityScore: 96,
+      priceHistory: [
+        { date: "2024-01", price: 150.00 },
+        { date: "2023-12", price: 148.00 },
+        { date: "2023-11", price: 152.00 },
+        { date: "2023-10", price: 155.00 }
+      ]
     },
     price: 145.50,
     inStock: true,
@@ -58,7 +66,14 @@ export const mockParts: Part[] = [
     },
     vendor: {
       name: "Global Bearings Inc.",
-      rating: 4.5
+      rating: 4.5,
+      shippingTime: "3-5 business days",
+      qualityScore: 88,
+      priceHistory: [
+        { date: "2024-01", price: 138.75 },
+        { date: "2023-12", price: 142.00 },
+        { date: "2023-11", price: 140.50 }
+      ]
     },
     price: 138.75,
     inStock: true,
@@ -92,7 +107,14 @@ export const mockParts: Part[] = [
     },
     vendor: {
       name: "Industrial Supply Ltd.",
-      rating: 4.2
+      rating: 4.2,
+      shippingTime: "5-7 business days",
+      qualityScore: 82,
+      priceHistory: [
+        { date: "2024-01", price: 125.00 },
+        { date: "2023-12", price: 128.00 },
+        { date: "2023-11", price: 126.50 }
+      ]
     },
     price: 125.00,
     inStock: true,
@@ -126,7 +148,14 @@ export const mockParts: Part[] = [
     },
     vendor: {
       name: "Quality Components Corp.",
-      rating: 4.6
+      rating: 4.6,
+      shippingTime: "1-2 business days",
+      qualityScore: 91,
+      priceHistory: [
+        { date: "2024-01", price: 132.90 },
+        { date: "2023-12", price: 135.00 },
+        { date: "2023-11", price: 133.50 }
+      ]
     },
     price: 132.90,
     inStock: false,
@@ -162,7 +191,14 @@ export const mockParts: Part[] = [
     },
     vendor: {
       name: "Precision Parts Co.",
-      rating: 4.8
+      rating: 4.8,
+      shippingTime: "2-3 business days",
+      qualityScore: 96,
+      priceHistory: [
+        { date: "2024-01", price: 168.00 },
+        { date: "2023-12", price: 165.00 },
+        { date: "2023-11", price: 170.00 }
+      ]
     },
     price: 168.00,
     inStock: true,
