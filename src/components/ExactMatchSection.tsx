@@ -22,6 +22,13 @@ interface ExactMatchSectionProps {
   onClick: () => void;
 }
 
+const getMatchColorClass = (percentage: number): string => {
+  if (percentage >= 90) return "bg-success text-success-foreground border-success";
+  if (percentage >= 70) return "bg-primary text-primary-foreground border-primary";
+  if (percentage >= 50) return "bg-warning text-warning-foreground border-warning";
+  return "bg-destructive text-destructive-foreground border-destructive";
+};
+
 const ExactMatchSection = ({ part, onClick }: ExactMatchSectionProps) => {
   return (
     <div className="mb-8">
@@ -29,10 +36,18 @@ const ExactMatchSection = ({ part, onClick }: ExactMatchSectionProps) => {
         <h2 className="text-2xl font-bold text-foreground">Exact Match</h2>
         {part.matchBreakdown && (
           <div className="flex gap-2">
-            <Badge variant="outline">Size: {part.matchBreakdown.size}%</Badge>
-            <Badge variant="outline">Material: {part.matchBreakdown.material}%</Badge>
-            <Badge variant="outline">Grade: {part.matchBreakdown.grade}%</Badge>
-            <Badge variant="outline">Specs: {part.matchBreakdown.specifications}%</Badge>
+            <Badge className={getMatchColorClass(part.matchBreakdown.size)}>
+              Size: {part.matchBreakdown.size}%
+            </Badge>
+            <Badge className={getMatchColorClass(part.matchBreakdown.material)}>
+              Material: {part.matchBreakdown.material}%
+            </Badge>
+            <Badge className={getMatchColorClass(part.matchBreakdown.grade)}>
+              Grade: {part.matchBreakdown.grade}%
+            </Badge>
+            <Badge className={getMatchColorClass(part.matchBreakdown.specifications)}>
+              Specs: {part.matchBreakdown.specifications}%
+            </Badge>
           </div>
         )}
       </div>
