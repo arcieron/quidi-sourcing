@@ -28,15 +28,6 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
       onClick={onClick}
     >
       <div className="flex gap-4">
-        {part.imageUrl && (
-          <div className="flex-shrink-0">
-            <img 
-              src={part.imageUrl} 
-              alt={part.partNumber}
-              className="w-24 h-24 object-cover rounded-md border border-border"
-            />
-          </div>
-        )}
         <div className="flex-1 min-w-0">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">

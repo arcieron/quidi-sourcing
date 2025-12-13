@@ -54,15 +54,6 @@ const ExactMatchSection = ({ part, onClick }: ExactMatchSectionProps) => {
       
       <Card className="p-6 border-success/50 shadow-lg cursor-pointer hover:shadow-xl transition-shadow" onClick={onClick}>
         <div className="flex gap-6 mb-6">
-          {part.imageUrl && (
-            <div className="flex-shrink-0">
-              <img 
-                src={part.imageUrl} 
-                alt={part.partNumber}
-                className="w-32 h-32 object-cover rounded-lg border-2 border-border"
-              />
-            </div>
-          )}
           <div className="flex-1">
             <h3 className="text-2xl font-bold text-foreground mb-2">{part.partNumber}</h3>
             <p className="text-base text-muted-foreground mb-4">{part.description}</p>
