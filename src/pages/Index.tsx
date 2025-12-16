@@ -6,7 +6,8 @@ import SearchInterface from "@/components/SearchInterface";
 import PartDetailDialog from "@/components/PartDetailDialog";
 import DrillDownChat from "@/components/DrillDownChat";
 import SearchConversation, { Message } from "@/components/SearchConversation";
-import { Part, SearchHistory } from "@/types/part";
+import { SearchHistory } from "@/types/part";
+import { PartsDataRow } from "@/types/partsData";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,8 +16,8 @@ import { useSearchMaterials } from "@/hooks/useMaterials";
 const Index = () => {
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [conversation, setConversation] = useState<Message[]>([]);
-  const [currentResults, setCurrentResults] = useState<Part[]>([]);
-  const [selectedPart, setSelectedPart] = useState<Part | null>(null);
+  const [currentResults, setCurrentResults] = useState<PartsDataRow[]>([]);
+  const [selectedPart, setSelectedPart] = useState<PartsDataRow | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const { user, loading } = useAuth();
@@ -32,7 +33,6 @@ const Index = () => {
   const handleSearch = async (query: string) => {
     try {
       const results = await search(query);
-      const sortedResults = results.sort((a, b) => b.matchScore - a.matchScore);
       
       const userMessage: Message = {
         id: Date.now().toString(),
@@ -43,24 +43,24 @@ const Index = () => {
       const systemMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "system",
-        content: `Found ${sortedResults.length} matching parts`,
-        results: sortedResults,
+        content: `Found ${results.length} matching parts`,
+        results: results,
       };
       
       setConversation([userMessage, systemMessage]);
-      setCurrentResults(sortedResults);
+      setCurrentResults(results);
 
       const newHistoryItem: SearchHistory = {
         id: Date.now().toString(),
         partNumber: query,
         timestamp: new Date(),
-        resultsCount: sortedResults.length
+        resultsCount: results.length
       };
       setSearchHistory([newHistoryItem, ...searchHistory]);
 
       toast({
         title: "Search Complete",
-        description: `Found ${sortedResults.length} matching parts for "${query}"`,
+        description: `Found ${results.length} matching parts for "${query}"`,
       });
     } catch (error) {
       toast({
@@ -75,7 +75,7 @@ const Index = () => {
     handleSearch(partNumber);
   };
 
-  const handleSelectPart = (part: Part) => {
+  const handleSelectPart = (part: PartsDataRow) => {
     setSelectedPart(part);
     setIsDialogOpen(true);
   };
@@ -84,25 +84,30 @@ const Index = () => {
     let filteredResults = [...currentResults];
     const lowerQuery = query.toLowerCase();
     
+    // Filter by basic_material or material_group
     if (lowerQuery.includes("stainless steel 316") || lowerQuery.includes("316")) {
       filteredResults = filteredResults.filter(part => 
-        part.material.toLowerCase().includes("stainless steel 316")
+        (part.basic_material?.toLowerCase().includes("316")) ||
+        (part.material_group?.toLowerCase().includes("316"))
       );
     } else if (lowerQuery.includes("304")) {
       filteredResults = filteredResults.filter(part => 
-        part.material.toLowerCase().includes("304")
+        (part.basic_material?.toLowerCase().includes("304")) ||
+        (part.material_group?.toLowerCase().includes("304"))
       );
     } else if (lowerQuery.includes("in stock") || lowerQuery.includes("stock")) {
-      filteredResults = filteredResults.filter(part => part.inStock);
+      filteredResults = filteredResults.filter(part => part.in_stock);
     } else if (lowerQuery.includes("previously ordered") || lowerQuery.includes("ordered")) {
-      filteredResults = filteredResults.filter(part => part.orderHistory && part.orderHistory.length > 0);
+      filteredResults = filteredResults.filter(part => part.po_value != null);
     } else if (lowerQuery.includes("chrome")) {
       filteredResults = filteredResults.filter(part => 
-        part.material.toLowerCase().includes("chrome")
+        part.basic_material?.toLowerCase().includes("chrome") ||
+        part.material_group?.toLowerCase().includes("chrome")
       );
     } else if (lowerQuery.includes("steel")) {
       filteredResults = filteredResults.filter(part => 
-        part.material.toLowerCase().includes("steel")
+        part.basic_material?.toLowerCase().includes("steel") ||
+        part.material_group?.toLowerCase().includes("steel")
       );
     }
     

@@ -1,0 +1,39 @@
+// Raw database type - matches parts_data table exactly
+export interface PartsDataRow {
+  id: string;
+  material_number: string | null;
+  basic_material: string | null;
+  description: string | null;
+  old_description: string | null;
+  material_group: string | null;
+  material_type: string | null;
+  ext_material_group: string | null;
+  size_dimension: string | null;
+  vendor_code: string | null;
+  vendor_name: string | null;
+  business_partner: string | null;
+  purchasing_document: string | null;
+  purchase_doc_item: string | null;
+  purchasing_org: string | null;
+  division: string | null;
+  organizational_unit: string | null;
+  po_value: number | null;
+  po_quantity: number | null;
+  counter_of_po: number | null;
+  counter_of_material: number | null;
+  created_by: string | null;
+  changed_by: string | null;
+  created_on: string | null;
+  changed_on: string | null;
+  company_created: string | null;
+  in_stock: boolean | null;
+  quantity: number | null;
+  price: number | null;
+  location: string | null;
+  weight: number | null;
+  grade: string | null;
+  certifications: string[] | null;
+  quality_score: number | null;
+  avg_shipping_days: number | null;
+  inserted_at: string | null;
+}
