@@ -1,7 +1,7 @@
 import { PartsDataRow } from "@/types/partsData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Package, DollarSign, History, Truck, Award, ThumbsUp, FileText } from "lucide-react";
+import { Package, DollarSign, History, Truck, Award, ThumbsUp, FileText } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -134,56 +134,40 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
             </div>
           )}
 
-          <div className="flex items-center justify-between">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="text-sm text-muted-foreground cursor-help hover:text-foreground transition-colors">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="text-sm text-muted-foreground cursor-help hover:text-foreground transition-colors">
+                  {part.vendor_name || part.vendor_code || "Unknown Vendor"}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <div className="space-y-2">
+                  <div className="font-semibold text-sm border-b border-border pb-1">
                     {part.vendor_name || part.vendor_code || "Unknown Vendor"}
                   </div>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <div className="space-y-2">
-                    <div className="font-semibold text-sm border-b border-border pb-1">
-                      {part.vendor_name || part.vendor_code || "Unknown Vendor"}
+                  {part.quality_score != null && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Award className="h-3 w-3" />
+                      <span>Quality Score: {part.quality_score}</span>
                     </div>
-                    {part.quality_score != null && (
-                      <div className="flex items-center gap-2 text-xs">
-                        <Award className="h-3 w-3" />
-                        <span>Quality Score: {part.quality_score}</span>
-                      </div>
-                    )}
-                    {part.avg_shipping_days != null && (
-                      <div className="flex items-center gap-2 text-xs">
-                        <Truck className="h-3 w-3" />
-                        <span>Avg Shipping: {part.avg_shipping_days} days</span>
-                      </div>
-                    )}
-                    {part.division && (
-                      <div className="text-xs">Division: {part.division}</div>
-                    )}
-                    {part.organizational_unit && (
-                      <div className="text-xs">Org Unit: {part.organizational_unit}</div>
-                    )}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            {part.in_stock ? (
-              <div className="flex items-center gap-1">
-                <Badge variant="outline" className="text-success border-success">
-                  In Stock: {part.quantity}
-                </Badge>
-                {part.location && (
-                  <MapPin className="h-3 w-3 text-success" />
-                )}
-              </div>
-            ) : (
-              <Badge variant="outline" className="text-muted-foreground">
-                Not in Stock
-              </Badge>
-            )}
-          </div>
+                  )}
+                  {part.avg_shipping_days != null && (
+                    <div className="flex items-center gap-2 text-xs">
+                      <Truck className="h-3 w-3" />
+                      <span>Avg Shipping: {part.avg_shipping_days} days</span>
+                    </div>
+                  )}
+                  {part.division && (
+                    <div className="text-xs">Division: {part.division}</div>
+                  )}
+                  {part.organizational_unit && (
+                    <div className="text-xs">Org Unit: {part.organizational_unit}</div>
+                  )}
+                </div>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
     </Card>
