@@ -2,6 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PartsDataRow } from "@/types/partsData";
 
+const SEARCHABLE_FIELDS = [
+  "material_number", "description", "material_group", "basic_material", 
+  "vendor_name", "size_dimension", "grade", "division", "ext_material_group", 
+  "material_type", "location", "vendor_code", "business_partner", 
+  "purchasing_org", "organizational_unit"
+];
+
+const buildSearchFilter = (term: string): string => {
+  return SEARCHABLE_FIELDS.map(field => `${field}.ilike.%${term}%`).join(",");
+};
+
 export const useMaterials = (searchQuery?: string) => {
   return useQuery({
     queryKey: ["materials", searchQuery],
@@ -9,9 +20,11 @@ export const useMaterials = (searchQuery?: string) => {
       let query = supabase.from("parts_data").select("*");
       
       if (searchQuery) {
-        query = query.or(
-          `material_number.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,material_group.ilike.%${searchQuery}%,vendor_name.ilike.%${searchQuery}%,basic_material.ilike.%${searchQuery}%,size_dimension.ilike.%${searchQuery}%,grade.ilike.%${searchQuery}%,division.ilike.%${searchQuery}%,ext_material_group.ilike.%${searchQuery}%,material_type.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,vendor_code.ilike.%${searchQuery}%,business_partner.ilike.%${searchQuery}%,purchasing_org.ilike.%${searchQuery}%,organizational_unit.ilike.%${searchQuery}%`
-        );
+        const terms = searchQuery.trim().split(/\s+/).filter(t => t.length > 0);
+        
+        for (const term of terms) {
+          query = query.or(buildSearchFilter(term));
+        }
       }
       
       const { data, error } = await query.limit(100);
@@ -25,13 +38,17 @@ export const useMaterials = (searchQuery?: string) => {
 
 export const useSearchMaterials = () => {
   const search = async (query: string): Promise<PartsDataRow[]> => {
-    const { data, error } = await supabase
-      .from("parts_data")
-      .select("*")
-      .or(
-        `material_number.ilike.%${query}%,description.ilike.%${query}%,material_group.ilike.%${query}%,basic_material.ilike.%${query}%,vendor_name.ilike.%${query}%,size_dimension.ilike.%${query}%,grade.ilike.%${query}%,division.ilike.%${query}%,ext_material_group.ilike.%${query}%,material_type.ilike.%${query}%,location.ilike.%${query}%,vendor_code.ilike.%${query}%,business_partner.ilike.%${query}%,purchasing_org.ilike.%${query}%,organizational_unit.ilike.%${query}%`
-      )
-      .limit(100);
+    const terms = query.trim().split(/\s+/).filter(t => t.length > 0);
+    
+    if (terms.length === 0) return [];
+    
+    let dbQuery = supabase.from("parts_data").select("*");
+    
+    for (const term of terms) {
+      dbQuery = dbQuery.or(buildSearchFilter(term));
+    }
+    
+    const { data, error } = await dbQuery.limit(100);
 
     if (error) throw error;
     return (data || []) as PartsDataRow[];
