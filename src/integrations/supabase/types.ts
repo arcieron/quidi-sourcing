@@ -14,243 +14,120 @@ export type Database = {
   }
   public: {
     Tables: {
-      material_vendors: {
+      parts_data: {
         Row: {
-          current_price: number | null
-          id: string
-          material_id: string | null
-          vendor_id: string | null
-        }
-        Insert: {
-          current_price?: number | null
-          id?: string
-          material_id?: string | null
-          vendor_id?: string | null
-        }
-        Update: {
-          current_price?: number | null
-          id?: string
-          material_id?: string | null
-          vendor_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "material_vendors_material_id_fkey"
-            columns: ["material_id"]
-            isOneToOne: false
-            referencedRelation: "materials"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "material_vendors_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      materials: {
-        Row: {
+          avg_shipping_days: number | null
           basic_material: string | null
+          business_partner: string | null
           certifications: string[] | null
           changed_by: string | null
           changed_on: string | null
           company_created: string | null
+          counter_of_material: number | null
+          counter_of_po: number | null
           created_by: string | null
           created_on: string | null
           description: string | null
+          division: string | null
           ext_material_group: string | null
           grade: string | null
           id: string
           in_stock: boolean | null
+          inserted_at: string | null
           location: string | null
           material_group: string | null
-          material_number: string
+          material_number: string | null
           material_type: string | null
           old_description: string | null
-          price: number | null
-          quantity: number | null
-          schematics: string | null
-          size_dimension: string | null
-          weight: number | null
-        }
-        Insert: {
-          basic_material?: string | null
-          certifications?: string[] | null
-          changed_by?: string | null
-          changed_on?: string | null
-          company_created?: string | null
-          created_by?: string | null
-          created_on?: string | null
-          description?: string | null
-          ext_material_group?: string | null
-          grade?: string | null
-          id?: string
-          in_stock?: boolean | null
-          location?: string | null
-          material_group?: string | null
-          material_number: string
-          material_type?: string | null
-          old_description?: string | null
-          price?: number | null
-          quantity?: number | null
-          schematics?: string | null
-          size_dimension?: string | null
-          weight?: number | null
-        }
-        Update: {
-          basic_material?: string | null
-          certifications?: string[] | null
-          changed_by?: string | null
-          changed_on?: string | null
-          company_created?: string | null
-          created_by?: string | null
-          created_on?: string | null
-          description?: string | null
-          ext_material_group?: string | null
-          grade?: string | null
-          id?: string
-          in_stock?: boolean | null
-          location?: string | null
-          material_group?: string | null
-          material_number?: string
-          material_type?: string | null
-          old_description?: string | null
-          price?: number | null
-          quantity?: number | null
-          schematics?: string | null
-          size_dimension?: string | null
-          weight?: number | null
-        }
-        Relationships: []
-      }
-      purchase_orders: {
-        Row: {
-          counter_of_material: number | null
-          counter_of_po: number | null
-          created_on: string | null
-          division: string | null
-          id: string
-          material_id: string | null
           organizational_unit: string | null
           po_quantity: number | null
           po_value: number | null
+          price: number | null
           purchase_doc_item: string | null
           purchasing_document: string | null
           purchasing_org: string | null
-          vendor_id: string | null
-        }
-        Insert: {
-          counter_of_material?: number | null
-          counter_of_po?: number | null
-          created_on?: string | null
-          division?: string | null
-          id?: string
-          material_id?: string | null
-          organizational_unit?: string | null
-          po_quantity?: number | null
-          po_value?: number | null
-          purchase_doc_item?: string | null
-          purchasing_document?: string | null
-          purchasing_org?: string | null
-          vendor_id?: string | null
-        }
-        Update: {
-          counter_of_material?: number | null
-          counter_of_po?: number | null
-          created_on?: string | null
-          division?: string | null
-          id?: string
-          material_id?: string | null
-          organizational_unit?: string | null
-          po_quantity?: number | null
-          po_value?: number | null
-          purchase_doc_item?: string | null
-          purchasing_document?: string | null
-          purchasing_org?: string | null
-          vendor_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "purchase_orders_material_id_fkey"
-            columns: ["material_id"]
-            isOneToOne: false
-            referencedRelation: "materials"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "purchase_orders_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vendor_price_history: {
-        Row: {
-          id: string
-          material_id: string | null
-          price: number | null
-          recorded_at: string | null
-          vendor_id: string | null
-        }
-        Insert: {
-          id?: string
-          material_id?: string | null
-          price?: number | null
-          recorded_at?: string | null
-          vendor_id?: string | null
-        }
-        Update: {
-          id?: string
-          material_id?: string | null
-          price?: number | null
-          recorded_at?: string | null
-          vendor_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "vendor_price_history_material_id_fkey"
-            columns: ["material_id"]
-            isOneToOne: false
-            referencedRelation: "materials"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vendor_price_history_vendor_id_fkey"
-            columns: ["vendor_id"]
-            isOneToOne: false
-            referencedRelation: "vendors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      vendors: {
-        Row: {
-          avg_shipping_days: number | null
-          business_partner: string | null
-          id: string
-          name: string
           quality_score: number | null
-          vendor_code: string
+          quantity: number | null
+          size_dimension: string | null
+          vendor_code: string | null
+          vendor_name: string | null
+          weight: number | null
         }
         Insert: {
           avg_shipping_days?: number | null
+          basic_material?: string | null
           business_partner?: string | null
+          certifications?: string[] | null
+          changed_by?: string | null
+          changed_on?: string | null
+          company_created?: string | null
+          counter_of_material?: number | null
+          counter_of_po?: number | null
+          created_by?: string | null
+          created_on?: string | null
+          description?: string | null
+          division?: string | null
+          ext_material_group?: string | null
+          grade?: string | null
           id?: string
-          name: string
+          in_stock?: boolean | null
+          inserted_at?: string | null
+          location?: string | null
+          material_group?: string | null
+          material_number?: string | null
+          material_type?: string | null
+          old_description?: string | null
+          organizational_unit?: string | null
+          po_quantity?: number | null
+          po_value?: number | null
+          price?: number | null
+          purchase_doc_item?: string | null
+          purchasing_document?: string | null
+          purchasing_org?: string | null
           quality_score?: number | null
-          vendor_code: string
+          quantity?: number | null
+          size_dimension?: string | null
+          vendor_code?: string | null
+          vendor_name?: string | null
+          weight?: number | null
         }
         Update: {
           avg_shipping_days?: number | null
+          basic_material?: string | null
           business_partner?: string | null
+          certifications?: string[] | null
+          changed_by?: string | null
+          changed_on?: string | null
+          company_created?: string | null
+          counter_of_material?: number | null
+          counter_of_po?: number | null
+          created_by?: string | null
+          created_on?: string | null
+          description?: string | null
+          division?: string | null
+          ext_material_group?: string | null
+          grade?: string | null
           id?: string
-          name?: string
+          in_stock?: boolean | null
+          inserted_at?: string | null
+          location?: string | null
+          material_group?: string | null
+          material_number?: string | null
+          material_type?: string | null
+          old_description?: string | null
+          organizational_unit?: string | null
+          po_quantity?: number | null
+          po_value?: number | null
+          price?: number | null
+          purchase_doc_item?: string | null
+          purchasing_document?: string | null
+          purchasing_org?: string | null
           quality_score?: number | null
-          vendor_code?: string
+          quantity?: number | null
+          size_dimension?: string | null
+          vendor_code?: string | null
+          vendor_name?: string | null
+          weight?: number | null
         }
         Relationships: []
       }

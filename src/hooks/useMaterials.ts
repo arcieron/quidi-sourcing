@@ -2,65 +2,51 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Part } from "@/types/part";
 
-interface MaterialWithVendors {
+interface PartsDataRow {
   id: string;
-  material_number: string;
+  material_number: string | null;
   basic_material: string | null;
   description: string | null;
+  old_description: string | null;
   material_group: string | null;
   material_type: string | null;
+  ext_material_group: string | null;
   size_dimension: string | null;
-  price: number | null;
-  in_stock: boolean | null;
-  quantity: number | null;
-  location: string | null;
-  grade: string | null;
-  certifications: string[] | null;
-  schematics: string | null;
-  weight: number | null;
-}
-
-interface PurchaseOrderData {
-  id: string;
+  vendor_code: string | null;
+  vendor_name: string | null;
+  business_partner: string | null;
+  purchasing_document: string | null;
+  purchase_doc_item: string | null;
+  purchasing_org: string | null;
+  division: string | null;
+  organizational_unit: string | null;
   po_value: number | null;
   po_quantity: number | null;
-  division: string | null;
+  counter_of_po: number | null;
+  counter_of_material: number | null;
+  created_by: string | null;
+  changed_by: string | null;
   created_on: string | null;
-  vendors: {
-    name: string;
-  } | null;
-}
-
-interface VendorPriceHistoryData {
+  changed_on: string | null;
+  company_created: string | null;
+  in_stock: boolean | null;
+  quantity: number | null;
   price: number | null;
-  recorded_at: string | null;
+  location: string | null;
+  weight: number | null;
+  grade: string | null;
+  certifications: string[] | null;
+  quality_score: number | null;
+  avg_shipping_days: number | null;
+  inserted_at: string | null;
 }
 
-interface MaterialVendorData {
-  current_price: number | null;
-  vendors: {
-    id: string;
-    name: string;
-    vendor_code: string;
-    quality_score: number | null;
-    avg_shipping_days: number | null;
-  } | null;
-}
-
-// Transform database material to Part interface
-const transformMaterialToPart = (
-  material: MaterialWithVendors,
-  purchaseOrders: PurchaseOrderData[],
-  vendorData: MaterialVendorData[],
-  priceHistory: VendorPriceHistoryData[]
-): Part => {
-  // Get the first vendor for this material
-  const primaryVendor = vendorData[0]?.vendors;
-  
+// Transform database row to Part interface
+const transformRowToPart = (row: PartsDataRow): Part => {
   // Parse dimensions from size_dimension string (e.g., "25x52x15mm")
   let dimensions = { length: 0, width: 0, height: 0, unit: "mm" };
-  if (material.size_dimension) {
-    const match = material.size_dimension.match(/(\d+)x(\d+)x(\d+)(\w+)?/);
+  if (row.size_dimension) {
+    const match = row.size_dimension.match(/(\d+)x(\d+)x(\d+)(\w+)?/);
     if (match) {
       dimensions = {
         length: parseInt(match[1]),
@@ -71,43 +57,28 @@ const transformMaterialToPart = (
     }
   }
 
-  // Transform order history
-  const orderHistory = purchaseOrders.map((po) => ({
-    date: po.created_on || new Date().toISOString(),
-    quantity: po.po_quantity || 0,
-    price: po.po_value || 0,
-    vendor: po.vendors?.name || "Unknown",
-    division: po.division || "Unknown",
-  }));
-
-  // Transform price history
-  const vendorPriceHistory = priceHistory.map((ph) => ({
-    date: ph.recorded_at || new Date().toISOString(),
-    price: ph.price || 0,
-  }));
-
   // Calculate match score based on available data
-  const matchScore = calculateMatchScore(material);
+  const matchScore = calculateMatchScore(row);
 
   return {
-    id: material.id,
-    partNumber: material.material_number,
-    description: material.description || "",
-    material: material.basic_material || "Unknown",
+    id: row.id,
+    partNumber: row.material_number || "",
+    description: row.description || "",
+    material: row.basic_material || "Unknown",
     dimensions,
     vendor: {
-      name: primaryVendor?.name || "Unknown Vendor",
-      rating: primaryVendor?.quality_score || 0,
-      shippingTime: primaryVendor?.avg_shipping_days 
-        ? `${primaryVendor.avg_shipping_days} days` 
+      name: row.vendor_name || "Unknown Vendor",
+      rating: row.quality_score || 0,
+      shippingTime: row.avg_shipping_days 
+        ? `${row.avg_shipping_days} days` 
         : undefined,
-      qualityScore: primaryVendor?.quality_score || undefined,
-      priceHistory: vendorPriceHistory,
+      qualityScore: row.quality_score || undefined,
+      priceHistory: [],
     },
-    price: material.price || 0,
-    inStock: material.in_stock || false,
-    quantity: material.quantity || 0,
-    location: material.location || undefined,
+    price: row.price || row.po_value || 0,
+    inStock: row.in_stock || false,
+    quantity: row.quantity || row.po_quantity || 0,
+    location: row.location || undefined,
     matchScore,
     matchBreakdown: {
       size: 85 + Math.random() * 15,
@@ -115,22 +86,27 @@ const transformMaterialToPart = (
       grade: 75 + Math.random() * 25,
       specifications: 80 + Math.random() * 20,
     },
-    orderHistory: orderHistory.length > 0 ? orderHistory : undefined,
-    schematics: material.schematics || undefined,
+    orderHistory: row.po_value ? [{
+      date: row.created_on || new Date().toISOString(),
+      quantity: row.po_quantity || 0,
+      price: row.po_value || 0,
+      vendor: row.vendor_name || "Unknown",
+      division: row.division || "Unknown",
+    }] : undefined,
     additionalMetadata: {
-      weight: material.weight || undefined,
-      grade: material.grade || undefined,
-      certifications: material.certifications || undefined,
+      weight: row.weight || undefined,
+      grade: row.grade || undefined,
+      certifications: row.certifications || undefined,
     },
   };
 };
 
-const calculateMatchScore = (material: MaterialWithVendors): number => {
+const calculateMatchScore = (row: PartsDataRow): number => {
   let score = 70;
-  if (material.description) score += 10;
-  if (material.in_stock) score += 10;
-  if (material.grade) score += 5;
-  if (material.certifications?.length) score += 5;
+  if (row.description) score += 10;
+  if (row.in_stock) score += 10;
+  if (row.grade) score += 5;
+  if (row.certifications?.length) score += 5;
   return Math.min(score, 100);
 };
 
@@ -138,71 +114,20 @@ export const useMaterials = (searchQuery?: string) => {
   return useQuery({
     queryKey: ["materials", searchQuery],
     queryFn: async (): Promise<Part[]> => {
-      // Fetch materials
-      let query = supabase.from("materials").select("*");
+      let query = supabase.from("parts_data").select("*");
       
       if (searchQuery) {
         query = query.or(
-          `material_number.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,material_group.ilike.%${searchQuery}%`
+          `material_number.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,material_group.ilike.%${searchQuery}%,vendor_name.ilike.%${searchQuery}%`
         );
       }
       
-      const { data: materials, error: materialsError } = await query;
+      const { data, error } = await query.limit(100);
       
-      if (materialsError) throw materialsError;
-      if (!materials || materials.length === 0) return [];
+      if (error) throw error;
+      if (!data || data.length === 0) return [];
 
-      const materialIds = materials.map((m) => m.id);
-
-      // Fetch related data for all materials
-      const [purchaseOrdersResult, materialVendorsResult, priceHistoryResult] = await Promise.all([
-        supabase
-          .from("purchase_orders")
-          .select("id, po_value, po_quantity, division, created_on, material_id, vendors(name)")
-          .in("material_id", materialIds),
-        supabase
-          .from("material_vendors")
-          .select("material_id, current_price, vendors(id, name, vendor_code, quality_score, avg_shipping_days)")
-          .in("material_id", materialIds),
-        supabase
-          .from("vendor_price_history")
-          .select("material_id, price, recorded_at")
-          .in("material_id", materialIds)
-          .order("recorded_at", { ascending: false }),
-      ]);
-
-      // Transform each material to Part
-      return materials.map((material) => {
-        const materialPOs = (purchaseOrdersResult.data || [])
-          .filter((po) => po.material_id === material.id)
-          .map(po => ({
-            ...po,
-            vendors: po.vendors as { name: string } | null
-          }));
-        
-        const materialVendors = (materialVendorsResult.data || [])
-          .filter((mv) => mv.material_id === material.id)
-          .map(mv => ({
-            ...mv,
-            vendors: mv.vendors as {
-              id: string;
-              name: string;
-              vendor_code: string;
-              quality_score: number | null;
-              avg_shipping_days: number | null;
-            } | null
-          }));
-        
-        const materialPriceHistory = (priceHistoryResult.data || [])
-          .filter((ph) => ph.material_id === material.id);
-
-        return transformMaterialToPart(
-          material as MaterialWithVendors,
-          materialPOs,
-          materialVendors,
-          materialPriceHistory
-        );
-      });
+      return data.map((row) => transformRowToPart(row as PartsDataRow));
     },
     enabled: true,
   });
@@ -210,65 +135,18 @@ export const useMaterials = (searchQuery?: string) => {
 
 export const useSearchMaterials = () => {
   const search = async (query: string): Promise<Part[]> => {
-    const { data: materials, error } = await supabase
-      .from("materials")
+    const { data, error } = await supabase
+      .from("parts_data")
       .select("*")
       .or(
-        `material_number.ilike.%${query}%,description.ilike.%${query}%,material_group.ilike.%${query}%,basic_material.ilike.%${query}%`
-      );
+        `material_number.ilike.%${query}%,description.ilike.%${query}%,material_group.ilike.%${query}%,basic_material.ilike.%${query}%,vendor_name.ilike.%${query}%`
+      )
+      .limit(100);
 
     if (error) throw error;
-    if (!materials || materials.length === 0) return [];
+    if (!data || data.length === 0) return [];
 
-    const materialIds = materials.map((m) => m.id);
-
-    const [purchaseOrdersResult, materialVendorsResult, priceHistoryResult] = await Promise.all([
-      supabase
-        .from("purchase_orders")
-        .select("id, po_value, po_quantity, division, created_on, material_id, vendors(name)")
-        .in("material_id", materialIds),
-      supabase
-        .from("material_vendors")
-        .select("material_id, current_price, vendors(id, name, vendor_code, quality_score, avg_shipping_days)")
-        .in("material_id", materialIds),
-      supabase
-        .from("vendor_price_history")
-        .select("material_id, price, recorded_at")
-        .in("material_id", materialIds)
-        .order("recorded_at", { ascending: false }),
-    ]);
-
-    return materials.map((material) => {
-      const materialPOs = (purchaseOrdersResult.data || [])
-        .filter((po) => po.material_id === material.id)
-        .map(po => ({
-          ...po,
-          vendors: po.vendors as { name: string } | null
-        }));
-      
-      const materialVendors = (materialVendorsResult.data || [])
-        .filter((mv) => mv.material_id === material.id)
-        .map(mv => ({
-          ...mv,
-          vendors: mv.vendors as {
-            id: string;
-            name: string;
-            vendor_code: string;
-            quality_score: number | null;
-            avg_shipping_days: number | null;
-          } | null
-        }));
-      
-      const materialPriceHistory = (priceHistoryResult.data || [])
-        .filter((ph) => ph.material_id === material.id);
-
-      return transformMaterialToPart(
-        material as MaterialWithVendors,
-        materialPOs,
-        materialVendors,
-        materialPriceHistory
-      );
-    });
+    return data.map((row) => transformRowToPart(row as PartsDataRow));
   };
 
   return { search };
