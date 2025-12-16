@@ -10,7 +10,7 @@ export const useMaterials = (searchQuery?: string) => {
       
       if (searchQuery) {
         query = query.or(
-          `material_number.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,material_group.ilike.%${searchQuery}%,vendor_name.ilike.%${searchQuery}%`
+          `material_number.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,material_group.ilike.%${searchQuery}%,vendor_name.ilike.%${searchQuery}%,basic_material.ilike.%${searchQuery}%,size_dimension.ilike.%${searchQuery}%,grade.ilike.%${searchQuery}%,division.ilike.%${searchQuery}%,ext_material_group.ilike.%${searchQuery}%,material_type.ilike.%${searchQuery}%,location.ilike.%${searchQuery}%,vendor_code.ilike.%${searchQuery}%,business_partner.ilike.%${searchQuery}%,purchasing_org.ilike.%${searchQuery}%,organizational_unit.ilike.%${searchQuery}%`
         );
       }
       
@@ -29,7 +29,7 @@ export const useSearchMaterials = () => {
       .from("parts_data")
       .select("*")
       .or(
-        `material_number.ilike.%${query}%,description.ilike.%${query}%,material_group.ilike.%${query}%,basic_material.ilike.%${query}%,vendor_name.ilike.%${query}%`
+        `material_number.ilike.%${query}%,description.ilike.%${query}%,material_group.ilike.%${query}%,basic_material.ilike.%${query}%,vendor_name.ilike.%${query}%,size_dimension.ilike.%${query}%,grade.ilike.%${query}%,division.ilike.%${query}%,ext_material_group.ilike.%${query}%,material_type.ilike.%${query}%,location.ilike.%${query}%,vendor_code.ilike.%${query}%,business_partner.ilike.%${query}%,purchasing_org.ilike.%${query}%,organizational_unit.ilike.%${query}%`
       )
       .limit(100);
 
