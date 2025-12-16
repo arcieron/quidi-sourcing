@@ -12,10 +12,7 @@ const AdminImport = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [importStats, setImportStats] = useState<{
     totalRows: number;
-    vendors: number;
-    materials: number;
-    purchaseOrders: number;
-    materialVendors: number;
+    inserted: number;
   } | null>(null);
   const { toast } = useToast();
 
@@ -55,7 +52,7 @@ const AdminImport = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("bulk-import", {
-        body: { data: markdownData },
+        body: { markdownData },
       });
 
       if (error) throw error;
@@ -64,7 +61,7 @@ const AdminImport = () => {
         setImportStats(data.stats);
         toast({
           title: "Import complete!",
-          description: `Imported ${data.stats.materials} materials and ${data.stats.purchaseOrders} purchase orders.`,
+          description: `Imported ${data.stats.inserted} rows into parts_data table.`,
         });
       } else {
         throw new Error(data.error || "Import failed");
@@ -88,7 +85,7 @@ const AdminImport = () => {
           <CardHeader>
             <CardTitle className="text-2xl">Bulk Data Import</CardTitle>
             <CardDescription>
-              Import all materials, vendors, and purchase orders from the Atlas Copco Excel file.
+              Import all parts data from the Atlas Copco Excel file into a single table.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -148,26 +145,14 @@ const AdminImport = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-bold">{importStats.totalRows}</div>
-                  <div className="text-sm text-muted-foreground">Total Rows</div>
+                  <div className="text-sm text-muted-foreground">Total Rows Parsed</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold">{importStats.vendors}</div>
-                  <div className="text-sm text-muted-foreground">Vendors</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{importStats.materials}</div>
-                  <div className="text-sm text-muted-foreground">Materials</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{importStats.purchaseOrders}</div>
-                  <div className="text-sm text-muted-foreground">Purchase Orders</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold">{importStats.materialVendors}</div>
-                  <div className="text-sm text-muted-foreground">Material-Vendor Links</div>
+                  <div className="text-2xl font-bold">{importStats.inserted}</div>
+                  <div className="text-sm text-muted-foreground">Rows Inserted</div>
                 </div>
               </div>
             </CardContent>
