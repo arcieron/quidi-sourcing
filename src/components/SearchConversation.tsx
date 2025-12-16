@@ -1,16 +1,16 @@
-import { Part } from "@/types/part";
+import { PartsDataRow } from "@/types/partsData";
 import ResultsSection from "./ResultsSection";
 
 interface Message {
   id: string;
   type: "user" | "system";
   content: string;
-  results?: Part[];
+  results?: PartsDataRow[];
 }
 
 interface SearchConversationProps {
   messages: Message[];
-  onSelectPart: (part: Part) => void;
+  onSelectPart: (part: PartsDataRow) => void;
 }
 
 const SearchConversation = ({ messages, onSelectPart }: SearchConversationProps) => {

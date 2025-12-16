@@ -1,19 +1,16 @@
-import { Part } from "@/types/part";
+import { PartsDataRow } from "@/types/partsData";
 import PartCard from "./PartCard";
-import ExactMatchSection from "./ExactMatchSection";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Package } from "lucide-react";
 
 interface ResultsSectionProps {
-  parts: Part[];
-  onSelectPart: (part: Part) => void;
+  parts: PartsDataRow[];
+  onSelectPart: (part: PartsDataRow) => void;
 }
 
 const ResultsSection = ({ parts, onSelectPart }: ResultsSectionProps) => {
-  const exactMatch = parts.find(p => p.matchScore >= 98);
-  const otherParts = parts.filter(p => p.matchScore < 98);
-  const inStockParts = otherParts.filter(p => p.inStock);
-  const outOfStockParts = otherParts.filter(p => !p.inStock);
+  const inStockParts = parts.filter(p => p.in_stock);
+  const outOfStockParts = parts.filter(p => !p.in_stock);
 
   if (parts.length === 0) {
     return (
@@ -29,14 +26,6 @@ const ResultsSection = ({ parts, onSelectPart }: ResultsSectionProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Exact Match Section */}
-      {exactMatch && (
-        <ExactMatchSection
-          part={exactMatch}
-          onClick={() => onSelectPart(exactMatch)}
-        />
-      )}
-
       {/* In Stock Section */}
       {inStockParts.length > 0 && (
         <div>
@@ -47,7 +36,7 @@ const ResultsSection = ({ parts, onSelectPart }: ResultsSectionProps) => {
           </div>
           <Alert className="mb-4 bg-success/10 border-success">
             <AlertDescription className="text-foreground">
-              {inStockParts.reduce((sum, p) => sum + p.quantity, 0)} total units available across {inStockParts.length} matching parts
+              {inStockParts.reduce((sum, p) => sum + (p.quantity || 0), 0)} total units available across {inStockParts.length} matching parts
             </AlertDescription>
           </Alert>
           <div className="grid gap-4">
@@ -62,11 +51,11 @@ const ResultsSection = ({ parts, onSelectPart }: ResultsSectionProps) => {
         </div>
       )}
 
-      {/* Out of Stock Section */}
+      {/* Out of Stock / All Results Section */}
       {outOfStockParts.length > 0 && (
         <div>
           <h2 className="text-xl font-semibold text-foreground mb-4">
-            Alternative Matches ({outOfStockParts.length})
+            {inStockParts.length > 0 ? "Other Results" : "Results"} ({outOfStockParts.length})
           </h2>
           <div className="grid gap-4">
             {outOfStockParts.map((part) => (

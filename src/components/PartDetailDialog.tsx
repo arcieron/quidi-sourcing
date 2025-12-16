@@ -1,4 +1,4 @@
-import { Part } from "@/types/part";
+import { PartsDataRow } from "@/types/partsData";
 import {
   Dialog,
   DialogContent,
@@ -6,25 +6,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Package, Ruler, DollarSign, Star, MapPin, Box, Award, Truck, TrendingUp } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Package, Ruler, DollarSign, MapPin, Award, Truck, Building2, FileText } from "lucide-react";
 
 interface PartDetailDialogProps {
-  part: Part | null;
+  part: PartsDataRow | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
@@ -38,199 +23,268 @@ const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) =
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
-              <DialogTitle className="text-2xl mb-1">{part.partNumber}</DialogTitle>
-              <p className="text-muted-foreground">{part.description}</p>
+              <DialogTitle className="text-2xl mb-1">{part.material_number || "N/A"}</DialogTitle>
+              <p className="text-muted-foreground">{part.description || part.old_description || "No description"}</p>
             </div>
-            <Badge className="bg-primary text-primary-foreground">
-              {part.matchScore}% Match
-            </Badge>
+            {part.in_stock && (
+              <Badge className="bg-success text-success-foreground">In Stock</Badge>
+            )}
           </div>
         </DialogHeader>
 
         <div className="space-y-6 mt-4">
-          {/* Basic Information */}
+          {/* Material Information */}
           <div>
             <h3 className="font-semibold mb-3 flex items-center gap-2">
               <Package className="h-4 w-4" />
-              Basic Information
+              Material Information
             </h3>
             <div className="grid grid-cols-2 gap-4 bg-muted p-4 rounded-lg">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Material</p>
-                <p className="font-medium">{part.material}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Price</p>
-                <p className="font-medium flex items-center gap-1">
-                  <DollarSign className="h-4 w-4" />
-                  {part.price.toFixed(2)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Vendor</p>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className="font-medium flex items-center gap-1 cursor-help hover:text-foreground transition-colors">
-                        {part.vendor.name}
-                        <Star className="h-3 w-3 text-warning fill-warning ml-1" />
-                        {part.vendor.rating}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent className="max-w-xs">
-                      <div className="space-y-2">
-                        <div className="font-semibold text-sm border-b border-border pb-1">{part.vendor.name}</div>
-                        {part.vendor.qualityScore && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <Award className="h-3 w-3" />
-                            <span>Quality Score: {part.vendor.qualityScore}%</span>
-                          </div>
-                        )}
-                        {part.vendor.shippingTime && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <Truck className="h-3 w-3" />
-                            <span>Average Shipping Time: {part.vendor.shippingTime}</span>
-                          </div>
-                        )}
-                        {part.vendor.priceHistory && part.vendor.priceHistory.length > 0 && (
-                          <div className="text-xs">
-                            <div className="flex items-center gap-2 mb-1">
-                              <TrendingUp className="h-3 w-3" />
-                              <span className="font-medium">Price History:</span>
-                            </div>
-                            <div className="pl-5 space-y-0.5">
-                              {part.vendor.priceHistory.slice(0, 3).map((history, idx) => (
-                                <div key={idx} className="text-muted-foreground">
-                                  {history.date}: ${history.price.toFixed(2)}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              {part.basic_material && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Basic Material</p>
+                  <p className="font-medium">{part.basic_material}</p>
+                </div>
+              )}
+              {part.material_group && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Material Group</p>
+                  <p className="font-medium">{part.material_group}</p>
+                </div>
+              )}
+              {part.material_type && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Material Type</p>
+                  <p className="font-medium">{part.material_type}</p>
+                </div>
+              )}
+              {part.ext_material_group && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Ext Material Group</p>
+                  <p className="font-medium">{part.ext_material_group}</p>
+                </div>
+              )}
+              {part.grade && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Grade</p>
+                  <p className="font-medium">{part.grade}</p>
+                </div>
+              )}
+              {part.size_dimension && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Size/Dimension</p>
+                  <p className="font-medium">{part.size_dimension}</p>
+                </div>
+              )}
+              {part.weight != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Weight</p>
+                  <p className="font-medium">{part.weight}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Pricing & Stock */}
+          <div>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Pricing & Stock
+            </h3>
+            <div className="grid grid-cols-2 gap-4 bg-muted p-4 rounded-lg">
+              {part.price != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Price</p>
+                  <p className="font-medium">${part.price}</p>
+                </div>
+              )}
+              {part.po_value != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">PO Value</p>
+                  <p className="font-medium">${part.po_value}</p>
+                </div>
+              )}
+              {part.po_quantity != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">PO Quantity</p>
+                  <p className="font-medium">{part.po_quantity}</p>
+                </div>
+              )}
+              {part.quantity != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Stock Quantity</p>
+                  <p className="font-medium">{part.quantity}</p>
+                </div>
+              )}
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Stock Status</p>
                 <p className="font-medium">
-                  {part.inStock ? (
-                    <Badge variant="outline" className="text-success border-success">
-                      In Stock ({part.quantity})
-                    </Badge>
+                  {part.in_stock ? (
+                    <Badge variant="outline" className="text-success border-success">In Stock</Badge>
                   ) : (
-                    <Badge variant="outline" className="text-muted-foreground">
-                      Out of Stock
-                    </Badge>
+                    <Badge variant="outline" className="text-muted-foreground">Out of Stock</Badge>
                   )}
                 </p>
               </div>
+              {part.location && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Location</p>
+                  <p className="font-medium flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    {part.location}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Dimensions */}
+          {/* Vendor Information */}
           <div>
             <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Ruler className="h-4 w-4" />
-              Dimensions
+              <Building2 className="h-4 w-4" />
+              Vendor Information
             </h3>
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="font-mono">
-                {part.dimensions.length} x {part.dimensions.width} x {part.dimensions.height} {part.dimensions.unit}
-              </p>
+            <div className="grid grid-cols-2 gap-4 bg-muted p-4 rounded-lg">
+              {part.vendor_name && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Vendor Name</p>
+                  <p className="font-medium">{part.vendor_name}</p>
+                </div>
+              )}
+              {part.vendor_code && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Vendor Code</p>
+                  <p className="font-medium">{part.vendor_code}</p>
+                </div>
+              )}
+              {part.business_partner && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Business Partner</p>
+                  <p className="font-medium">{part.business_partner}</p>
+                </div>
+              )}
+              {part.quality_score != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Quality Score</p>
+                  <p className="font-medium flex items-center gap-1">
+                    <Award className="h-3 w-3" />
+                    {part.quality_score}
+                  </p>
+                </div>
+              )}
+              {part.avg_shipping_days != null && (
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Avg Shipping Days</p>
+                  <p className="font-medium flex items-center gap-1">
+                    <Truck className="h-3 w-3" />
+                    {part.avg_shipping_days} days
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Location */}
-          {part.location && (
+          {/* Purchase Information */}
+          {(part.purchasing_document || part.purchasing_org || part.division) && (
             <div>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                Location
-              </h3>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="font-medium">{part.location}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Schematics */}
-          {part.schematics && (
-            <div>
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Box className="h-4 w-4" />
-                Technical Details
-              </h3>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm">{part.schematics}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Additional Metadata */}
-          {part.additionalMetadata && (
-            <div>
-              <h3 className="font-semibold mb-3 flex items-center gap-2">
-                <Award className="h-4 w-4" />
-                Additional Information
+                <FileText className="h-4 w-4" />
+                Purchase Information
               </h3>
               <div className="grid grid-cols-2 gap-4 bg-muted p-4 rounded-lg">
-                {part.additionalMetadata.weight && (
+                {part.purchasing_document && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Weight</p>
-                    <p className="font-medium">{part.additionalMetadata.weight} kg</p>
+                    <p className="text-sm text-muted-foreground mb-1">Purchasing Document</p>
+                    <p className="font-medium">{part.purchasing_document}</p>
                   </div>
                 )}
-                {part.additionalMetadata.grade && (
+                {part.purchase_doc_item && (
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Grade</p>
-                    <p className="font-medium">{part.additionalMetadata.grade}</p>
+                    <p className="text-sm text-muted-foreground mb-1">Purchase Doc Item</p>
+                    <p className="font-medium">{part.purchase_doc_item}</p>
                   </div>
                 )}
-                {part.additionalMetadata.certifications && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-muted-foreground mb-2">Certifications</p>
-                    <div className="flex gap-2 flex-wrap">
-                      {part.additionalMetadata.certifications.map((cert) => (
-                        <Badge key={cert} variant="secondary">{cert}</Badge>
-                      ))}
-                    </div>
+                {part.purchasing_org && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Purchasing Org</p>
+                    <p className="font-medium">{part.purchasing_org}</p>
+                  </div>
+                )}
+                {part.division && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Division</p>
+                    <p className="font-medium">{part.division}</p>
+                  </div>
+                )}
+                {part.organizational_unit && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Organizational Unit</p>
+                    <p className="font-medium">{part.organizational_unit}</p>
+                  </div>
+                )}
+                {part.counter_of_po != null && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Counter of PO</p>
+                    <p className="font-medium">{part.counter_of_po}</p>
+                  </div>
+                )}
+                {part.counter_of_material != null && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Counter of Material</p>
+                    <p className="font-medium">{part.counter_of_material}</p>
                   </div>
                 )}
               </div>
             </div>
           )}
 
-          {/* Order History */}
-          {part.orderHistory && part.orderHistory.length > 0 && (
+          {/* Audit Information */}
+          {(part.created_on || part.created_by || part.company_created) && (
             <div>
-              <h3 className="font-semibold mb-3">Order History</h3>
-              <div className="border rounded-lg overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Vendor</TableHead>
-                      <TableHead>Division</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {part.orderHistory.map((order, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-                        <TableCell>{order.quantity}</TableCell>
-                        <TableCell>${order.price.toFixed(2)}</TableCell>
-                        <TableCell>{order.vendor}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline">{order.division}</Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <h3 className="font-semibold mb-3">Audit Information</h3>
+              <div className="grid grid-cols-2 gap-4 bg-muted p-4 rounded-lg">
+                {part.created_on && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Created On</p>
+                    <p className="font-medium">{part.created_on}</p>
+                  </div>
+                )}
+                {part.created_by && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Created By</p>
+                    <p className="font-medium">{part.created_by}</p>
+                  </div>
+                )}
+                {part.changed_on && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Changed On</p>
+                    <p className="font-medium">{part.changed_on}</p>
+                  </div>
+                )}
+                {part.changed_by && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Changed By</p>
+                    <p className="font-medium">{part.changed_by}</p>
+                  </div>
+                )}
+                {part.company_created && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Company Created</p>
+                    <p className="font-medium">{part.company_created}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Certifications */}
+          {part.certifications && part.certifications.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-3">Certifications</h3>
+              <div className="flex gap-2 flex-wrap">
+                {part.certifications.map((cert, idx) => (
+                  <Badge key={idx} variant="secondary">{cert}</Badge>
+                ))}
               </div>
             </div>
           )}
