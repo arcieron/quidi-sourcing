@@ -1,15 +1,19 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
 
 interface AuthContextType {
-  user: User | null;
-  session: Session | null;
+  isAuthenticated: boolean;
   loading: boolean;
-  signOut: () => Promise<void>;
+  signIn: (password: string) => boolean;
+  signOut: () => void;
+  // Keep these for compatibility
+  user: { id: string } | null;
+  session: { user: { id: string } } | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const CORRECT_PASSWORD = "GARNETATLAS";
+const AUTH_KEY = "quidi_auth";
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -24,36 +28,37 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    const storedAuth = sessionStorage.getItem(AUTH_KEY);
+    if (storedAuth === "true") {
+      setIsAuthenticated(true);
+    }
+    setLoading(false);
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signIn = (password: string): boolean => {
+    if (password === CORRECT_PASSWORD) {
+      sessionStorage.setItem(AUTH_KEY, "true");
+      setIsAuthenticated(true);
+      return true;
+    }
+    return false;
   };
 
+  const signOut = () => {
+    sessionStorage.removeItem(AUTH_KEY);
+    setIsAuthenticated(false);
+  };
+
+  // Compatibility layer for existing code
+  const user = isAuthenticated ? { id: "authenticated-user" } : null;
+  const session = isAuthenticated ? { user: { id: "authenticated-user" } } : null;
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signOut }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, signIn, signOut, user, session }}>
       {children}
     </AuthContext.Provider>
   );

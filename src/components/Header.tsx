@@ -5,10 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { LogOut } from "lucide-react";
 
 const Header = () => {
-  const { user, signOut } = useAuth();
-  
-  const userInitial = user?.email?.charAt(0).toUpperCase() || "U";
-  const userEmail = user?.email || "User";
+  const { signOut } = useAuth();
 
   return (
     <header className="border-b border-border bg-background px-6 py-3">
@@ -23,11 +20,11 @@ const Header = () => {
         {/* Right: User Welcome and Logout */}
         <div className="flex items-center gap-3">
           <span className="text-muted-foreground text-sm">
-            Welcome, {userEmail}
+            Welcome
           </span>
           <Avatar className="h-9 w-9 bg-primary">
             <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-              {userInitial}
+              U
             </AvatarFallback>
           </Avatar>
           <Button 
