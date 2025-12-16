@@ -1,7 +1,7 @@
 import { PartsDataRow } from "@/types/partsData";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Package, DollarSign, History, Truck, Award } from "lucide-react";
+import { MapPin, Package, DollarSign, History, Truck, Award, ThumbsUp, FileText } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -14,7 +14,43 @@ interface PartCardProps {
   onClick: () => void;
 }
 
+const getSupplierRecommendation = (part: PartsDataRow) => {
+  const hasVendor = part.vendor_name || part.vendor_code;
+  const hasPOHistory = part.po_value || part.po_quantity || part.purchasing_document;
+  
+  if (!hasVendor) return null;
+  
+  let score = 0;
+  let reasons: string[] = [];
+  
+  if (part.po_value && part.po_value > 0) {
+    score += 2;
+    reasons.push(`$${part.po_value.toLocaleString()} total PO value`);
+  }
+  
+  if (part.po_quantity && part.po_quantity > 0) {
+    score += 1;
+    reasons.push(`${part.po_quantity.toLocaleString()} units ordered`);
+  }
+  
+  if (part.purchasing_document) {
+    score += 1;
+    reasons.push("Active PO on file");
+  }
+  
+  if (!hasPOHistory) return null;
+  
+  return {
+    isRecommended: score >= 2,
+    score,
+    reasons,
+    vendor: part.vendor_name || part.vendor_code
+  };
+};
+
 const PartCard = ({ part, onClick }: PartCardProps) => {
+  const recommendation = getSupplierRecommendation(part);
+  
   return (
     <Card
       className="p-4 hover:shadow-md transition-shadow cursor-pointer border-border"
@@ -61,6 +97,40 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
           {part.size_dimension && (
             <div className="text-sm text-muted-foreground mb-3">
               Size: {part.size_dimension}
+            </div>
+          )}
+
+          {/* Supplier Recommendation */}
+          {recommendation && (
+            <div className="mb-3 p-2 rounded-md bg-muted/50 border border-border">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-2 cursor-help">
+                      {recommendation.isRecommended ? (
+                        <ThumbsUp className="h-4 w-4 text-success" />
+                      ) : (
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                      )}
+                      <span className={`text-sm font-medium ${recommendation.isRecommended ? 'text-success' : 'text-muted-foreground'}`}>
+                        {recommendation.isRecommended ? 'Recommended Supplier' : 'Supplier on Record'}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs">
+                    <div className="space-y-1">
+                      <div className="font-semibold text-sm border-b border-border pb-1">
+                        {recommendation.vendor}
+                      </div>
+                      {recommendation.reasons.map((reason, idx) => (
+                        <div key={idx} className="text-xs flex items-center gap-1">
+                          <span className="text-success">•</span> {reason}
+                        </div>
+                      ))}
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           )}
 
