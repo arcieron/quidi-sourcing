@@ -27,6 +27,9 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Helper to sanitize values for PostgREST filters (remove commas and special chars)
+    const sanitize = (val: string) => val.replace(/[,()'"]/g, '').trim().split(/\s+/)[0];
+
     // Query for candidate parts with similar attributes
     let query = supabase.from('parts_data').select('*');
     
@@ -36,15 +39,19 @@ serve(async (req) => {
     }
 
     // Get parts from similar material group or basic material
-    const orFilters = [];
+    // Use first word only to avoid special character issues
+    const orFilters: string[] = [];
     if (targetPart.material_group) {
-      orFilters.push(`material_group.ilike.%${targetPart.material_group}%`);
+      const val = sanitize(targetPart.material_group);
+      if (val) orFilters.push(`material_group.ilike.%${val}%`);
     }
     if (targetPart.basic_material) {
-      orFilters.push(`basic_material.ilike.%${targetPart.basic_material}%`);
+      const val = sanitize(targetPart.basic_material);
+      if (val) orFilters.push(`basic_material.ilike.%${val}%`);
     }
     if (targetPart.ext_material_group) {
-      orFilters.push(`ext_material_group.ilike.%${targetPart.ext_material_group}%`);
+      const val = sanitize(targetPart.ext_material_group);
+      if (val) orFilters.push(`ext_material_group.ilike.%${val}%`);
     }
     
     if (orFilters.length > 0) {
