@@ -24,7 +24,7 @@ const SimilarPartsSection = ({
     <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/20">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles className="h-5 w-5 text-primary" />
-        <h3 className="font-semibold text-foreground">AI-Suggested Alternatives</h3>
+        <h3 className="font-semibold text-foreground">Alternatives</h3>
         <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
           AI
         </span>
