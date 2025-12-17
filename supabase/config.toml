@@ -2,3 +2,6 @@ project_id = "hvntpbxznvbdrlijsmfx"
 
 [functions.bulk-import]
 verify_jwt = false
+
+[functions.find-similar-parts]
+verify_jwt = false

@@ -6,12 +6,14 @@ import SearchInterface from "@/components/SearchInterface";
 import PartDetailDialog from "@/components/PartDetailDialog";
 import DrillDownChat from "@/components/DrillDownChat";
 import SearchConversation, { Message } from "@/components/SearchConversation";
+import SimilarPartsSection from "@/components/SimilarPartsSection";
 import { SearchHistory } from "@/types/part";
 import { PartsDataRow } from "@/types/partsData";
 import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSearchMaterials } from "@/hooks/useMaterials";
+import { useSimilarParts } from "@/hooks/useSimilarParts";
 
 const Index = () => {
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
@@ -23,6 +25,7 @@ const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { search } = useSearchMaterials();
+  const { similarParts, isLoading: isSimilarLoading, error: similarError, findSimilarParts, clearSimilarParts } = useSimilarParts();
 
   useEffect(() => {
     if (!loading && !user) {
@@ -32,6 +35,7 @@ const Index = () => {
 
   const handleSearch = async (query: string) => {
     try {
+      clearSimilarParts();
       const results = await search(query);
       
       const userMessage: Message = {
@@ -62,6 +66,11 @@ const Index = () => {
         title: "Search Complete",
         description: `Found ${results.length} matching parts for "${query}"`,
       });
+
+      // Trigger AI similar parts analysis for exact/narrow searches (1-5 results)
+      if (results.length >= 1 && results.length <= 5) {
+        findSimilarParts(results[0]);
+      }
     } catch (error) {
       toast({
         title: "Search Failed",
@@ -165,6 +174,15 @@ const Index = () => {
                 messages={conversation}
                 onSelectPart={handleSelectPart}
               />
+              
+              {conversation.length > 0 && (
+                <SimilarPartsSection
+                  similarParts={similarParts}
+                  isLoading={isSimilarLoading}
+                  error={similarError}
+                  onSelectPart={handleSelectPart}
+                />
+              )}
             </div>
           </ScrollArea>
 
