@@ -168,9 +168,11 @@ const Index = () => {
             </div>
           </ScrollArea>
 
+          {/* DrillDownChat hidden for now
           {conversation.length > 0 && (
             <DrillDownChat onRefine={handleRefineSearch} />
           )}
+          */}
         </div>
       </div>
 
