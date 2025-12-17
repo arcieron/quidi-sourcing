@@ -27,10 +27,19 @@ export const useMaterials = (searchQuery?: string) => {
         }
       }
       
-      const { data, error } = await query.limit(100);
+      const { data, error } = await query.limit(200);
       
       if (error) throw error;
-      return (data || []) as PartsDataRow[];
+      
+      // Remove duplicates based on material_number
+      const seen = new Set<string>();
+      const unique = (data || []).filter((item) => {
+        if (!item.material_number || seen.has(item.material_number)) return false;
+        seen.add(item.material_number);
+        return true;
+      });
+      
+      return unique.slice(0, 100) as PartsDataRow[];
     },
     enabled: true,
   });
@@ -48,10 +57,19 @@ export const useSearchMaterials = () => {
       dbQuery = dbQuery.or(buildSearchFilter(term));
     }
     
-    const { data, error } = await dbQuery.limit(100);
+    const { data, error } = await dbQuery.limit(200);
 
     if (error) throw error;
-    return (data || []) as PartsDataRow[];
+    
+    // Remove duplicates based on material_number
+    const seen = new Set<string>();
+    const unique = (data || []).filter((item) => {
+      if (!item.material_number || seen.has(item.material_number)) return false;
+      seen.add(item.material_number);
+      return true;
+    });
+    
+    return unique.slice(0, 100) as PartsDataRow[];
   };
 
   return { search };
