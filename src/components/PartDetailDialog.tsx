@@ -1,22 +1,18 @@
 import { PartsDataRow } from "@/types/partsData";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Package, DollarSign, Building2, FileText, Calendar, User } from "lucide-react";
-
 interface PartDetailDialogProps {
   part: PartsDataRow | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) => {
+const PartDetailDialog = ({
+  part,
+  open,
+  onOpenChange
+}: PartDetailDialogProps) => {
   if (!part) return null;
-
   const formatDate = (dateStr: string | null) => {
     if (!dateStr) return null;
     try {
@@ -25,9 +21,7 @@ const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) =
       return dateStr;
     }
   };
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+  return <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between">
@@ -35,9 +29,7 @@ const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) =
               <DialogTitle className="text-2xl mb-1">{part.material_number || "N/A"}</DialogTitle>
               <p className="text-muted-foreground">{part.description || "No description"}</p>
             </div>
-            <Badge variant={part.in_stock ? "default" : "secondary"} className={part.in_stock ? "bg-success" : ""}>
-              {part.in_stock ? "In Stock" : "Not in Stock"}
-            </Badge>
+            
           </div>
         </DialogHeader>
 
@@ -53,9 +45,7 @@ const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) =
               <Field label="Material Group" value={part.material_group} />
               <Field label="Material Type" value={part.material_type} />
               <Field label="Size/Dimension" value={part.size_dimension} />
-              {part.company_created && (
-                <Field label="Company" value={part.company_created} className="col-span-2" />
-              )}
+              {part.company_created && <Field label="Company" value={part.company_created} className="col-span-2" />}
             </div>
           </div>
 
@@ -104,8 +94,7 @@ const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) =
           </div>
 
           {/* Counters */}
-          {(part.counter_of_po != null || part.counter_of_material != null) && (
-            <div>
+          {(part.counter_of_po != null || part.counter_of_material != null) && <div>
               <h3 className="font-semibold mb-3 flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Counters
@@ -114,22 +103,24 @@ const PartDetailDialog = ({ part, open, onOpenChange }: PartDetailDialogProps) =
                 <Field label="Counter of PO" value={part.counter_of_po?.toString()} />
                 <Field label="Counter of Material" value={part.counter_of_material?.toString()} />
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
-const Field = ({ label, value, className = "" }: { label: string; value: string | null | undefined; className?: string }) => {
+const Field = ({
+  label,
+  value,
+  className = ""
+}: {
+  label: string;
+  value: string | null | undefined;
+  className?: string;
+}) => {
   if (!value || value === "Not assigned") return null;
-  return (
-    <div className={className}>
+  return <div className={className}>
       <p className="text-muted-foreground mb-1">{label}</p>
       <p className="font-medium text-foreground">{value}</p>
-    </div>
-  );
+    </div>;
 };
-
 export default PartDetailDialog;
