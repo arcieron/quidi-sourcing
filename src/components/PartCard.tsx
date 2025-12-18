@@ -1,7 +1,6 @@
 import { PartsDataRow } from "@/types/partsData";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Package, DollarSign, History, Truck, Award, ThumbsUp, FileText } from "lucide-react";
+import { Package, DollarSign, Truck, Award, ThumbsUp, FileText } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -60,15 +59,7 @@ const PartCard = ({ part, onClick }: PartCardProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="font-semibold text-foreground">{part.material_number || "N/A"}</h3>
-                {part.po_value && (
-                  <Badge variant="outline" className="text-primary border-primary">
-                    <History className="h-3 w-3 mr-1" />
-                    Previously Ordered
-                  </Badge>
-                )}
-              </div>
+              <h3 className="font-semibold text-foreground mb-1">{part.material_number || "N/A"}</h3>
               <p className="text-sm text-muted-foreground line-clamp-1">
                 {part.description || part.old_description || "No description"}
               </p>
