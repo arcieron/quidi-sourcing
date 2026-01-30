@@ -33,6 +33,24 @@ interface ParsedRow {
   company_created: string | null;
 }
 
+// Convert Excel serial date to ISO string
+function parseExcelDate(val: unknown): string | null {
+  if (val === undefined || val === null || val === "" || val === "-" || val === "N/A") return null;
+  
+  // If it's already a proper date string (ISO format), return it
+  if (typeof val === 'string' && val.includes('T')) return val;
+  
+  // If it's a number or numeric string (Excel serial date), convert it
+  const serialNum = typeof val === 'number' ? val : parseFloat(String(val));
+  if (isNaN(serialNum)) return null;
+  
+  // Excel epoch is Dec 30, 1899 (accounting for the 1900 leap year bug)
+  const excelEpoch = new Date(1899, 11, 30);
+  const date = new Date(excelEpoch.getTime() + serialNum * 24 * 60 * 60 * 1000);
+  
+  return date.toISOString();
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -55,8 +73,15 @@ Deno.serve(async (req) => {
     console.log("Starting bulk import...");
     console.log(`Received ${rows.length} rows to import`);
 
-    // Validate rows have material_number
-    const validRows: ParsedRow[] = rows.filter((row: ParsedRow) => row.material_number);
+    // Validate and transform rows
+    const validRows: ParsedRow[] = rows
+      .filter((row: ParsedRow) => row.material_number)
+      .map((row: ParsedRow) => ({
+        ...row,
+        created_on: parseExcelDate(row.created_on),
+        changed_on: parseExcelDate(row.changed_on),
+      }));
+    
     console.log(`${validRows.length} valid rows with material_number`);
 
     if (validRows.length === 0) {
