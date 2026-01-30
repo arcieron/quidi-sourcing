@@ -46,7 +46,7 @@ export const useMaterials = (searchQuery?: string) => {
 };
 
 export const useSearchMaterials = () => {
-  const search = async (query: string): Promise<PartsDataRow[]> => {
+  const keywordSearch = async (query: string): Promise<PartsDataRow[]> => {
     const terms = query.trim().split(/\s+/).filter(t => t.length > 0);
     
     if (terms.length === 0) return [];
@@ -72,5 +72,26 @@ export const useSearchMaterials = () => {
     return unique.slice(0, 100) as PartsDataRow[];
   };
 
-  return { search };
+  const semanticSearch = async (query: string): Promise<PartsDataRow[]> => {
+    const { data, error } = await supabase.functions.invoke('semantic-search', {
+      body: { query }
+    });
+
+    if (error) throw error;
+    
+    if (data?.error) {
+      throw new Error(data.error);
+    }
+    
+    return (data?.results || []) as PartsDataRow[];
+  };
+
+  const search = async (query: string, type: "keyword" | "semantic" = "keyword"): Promise<PartsDataRow[]> => {
+    if (type === "semantic") {
+      return semanticSearch(query);
+    }
+    return keywordSearch(query);
+  };
+
+  return { search, keywordSearch, semanticSearch };
 };
