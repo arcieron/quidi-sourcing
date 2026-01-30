@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import SearchSidebar from "@/components/SearchSidebar";
-import SearchInterface from "@/components/SearchInterface";
+import SearchInterface, { SearchType } from "@/components/SearchInterface";
 import PartDetailDialog from "@/components/PartDetailDialog";
 import DrillDownChat from "@/components/DrillDownChat";
 import SearchConversation, { Message } from "@/components/SearchConversation";
@@ -33,10 +33,10 @@ const Index = () => {
     }
   }, [user, loading, navigate]);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, searchType: SearchType = "keyword") => {
     try {
       clearSimilarParts();
-      const results = await search(query);
+      const results = await search(query, searchType);
       
       const userMessage: Message = {
         id: Date.now().toString(),
@@ -47,7 +47,7 @@ const Index = () => {
       const systemMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: "system",
-        content: `Found ${results.length} matching parts`,
+        content: `Found ${results.length} matching parts${searchType === "semantic" ? " (AI-powered)" : ""}`,
         results: results,
       };
       
