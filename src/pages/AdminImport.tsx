@@ -74,7 +74,8 @@ const AdminImport = () => {
 
     try {
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
+      const isCsv = file.name.toLowerCase().endsWith('.csv');
+      const workbook = XLSX.read(data, { type: 'array', raw: isCsv ? false : undefined });
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: null });
@@ -175,8 +176,8 @@ const AdminImport = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">Bulk Data Import</CardTitle>
-            <CardDescription>
-              Upload an Excel file (.xlsx, .xls) to import parts data.
+          <CardDescription>
+            Upload an Excel (.xlsx, .xls) or CSV file to import parts data.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -184,7 +185,7 @@ const AdminImport = () => {
               type="file"
               ref={fileInputRef}
               onChange={handleFileSelect}
-              accept=".xlsx,.xls"
+              accept=".xlsx,.xls,.csv"
               className="hidden"
             />
             
@@ -202,9 +203,9 @@ const AdminImport = () => {
                 </div>
               ) : (
                 <div>
-                  <p className="font-medium">Click to select an Excel file</p>
+                  <p className="font-medium">Click to select a file</p>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Supports .xlsx and .xls files
+                    Supports .xlsx, .xls, and .csv files
                   </p>
                 </div>
               )}
