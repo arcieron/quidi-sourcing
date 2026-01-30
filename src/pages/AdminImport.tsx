@@ -64,6 +64,24 @@ const AdminImport = () => {
     return isNaN(num) ? null : num;
   };
 
+  // Excel stores dates as serial numbers (days since 1900-01-01)
+  const parseExcelDate = (val: unknown): string | null => {
+    if (val === undefined || val === null || val === "" || val === "-" || val === "N/A") return null;
+    
+    // If it's already a date string, return it
+    if (typeof val === 'string' && val.includes('-')) return val;
+    
+    // If it's a number (Excel serial date), convert it
+    const serialNum = typeof val === 'number' ? val : parseFloat(String(val));
+    if (isNaN(serialNum)) return null;
+    
+    // Excel epoch is Dec 30, 1899 (accounting for the 1900 leap year bug)
+    const excelEpoch = new Date(1899, 11, 30);
+    const date = new Date(excelEpoch.getTime() + serialNum * 24 * 60 * 60 * 1000);
+    
+    return date.toISOString();
+  };
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -91,10 +109,10 @@ const AdminImport = () => {
           changed_by: cleanValue(row["Changed By"]),
           business_partner: cleanValue(row["Business Partner"]),
           organizational_unit: cleanValue(row["Organizational Unit"]),
-          changed_on: cleanValue(row["Changed on"]),
+          changed_on: parseExcelDate(row["Changed on"]),
           company_created: cleanValue(row["Company Created"]),
           created_by: cleanValue(row["Created by"]),
-          created_on: cleanValue(row["Created on"]),
+          created_on: parseExcelDate(row["Created on"]),
           description: cleanValue(row["Desc. in English"]),
           old_description: cleanValue(row["Old description"]),
           ext_material_group: cleanValue(row["Ext. Matl Group"]),
