@@ -25,20 +25,23 @@ interface VendorSummary {
   vendor_code: string;
   po_count: number;
   avg_lead_time: string;
-  on_time_pct: number;
+  avg_shipping_days: number;
   avg_price: number;
+  total_po_value: number;
   is_current: boolean;
 }
 
 interface PORecord {
+  id: string;
   po_number: string;
   vendor_name: string;
   po_date: string | null;
   gr_date: string | null;
-  on_time: boolean;
   lead_time: string;
+  avg_shipping_days: number | null;
   quantity: number | null;
   price: number | null;
+  po_value: number | null;
 }
 
 const PartDetailDialog = ({
@@ -50,6 +53,11 @@ const PartDetailDialog = ({
   const [poRecords, setPoRecords] = useState<PORecord[]>([]);
   const [vendors, setVendors] = useState<VendorSummary[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Get vendor name from company_created or vendor_name field
+  const getVendorName = (record: PartsDataRow): string => {
+    return record.company_created || record.vendor_name || "Unknown Vendor";
+  };
 
   useEffect(() => {
     if (part?.material_number && open) {
@@ -69,63 +77,91 @@ const PartDetailDialog = ({
       if (error) throw error;
 
       if (data && data.length > 0) {
-        // Build vendor summary
+        // Build vendor summary - group by vendor (using company_created as primary vendor field)
         const vendorMap = new Map<string, {
           vendor_name: string;
           vendor_code: string;
           po_count: number;
           total_price: number;
+          total_po_value: number;
           total_shipping_days: number;
+          records_with_shipping: number;
           records: number;
         }>();
 
         data.forEach((record) => {
-          const key = record.vendor_code || record.vendor_name || "Unknown";
+          const vendorName = record.company_created || record.vendor_name || "Unknown Vendor";
+          const key = vendorName;
           const existing = vendorMap.get(key);
+          
           if (existing) {
             existing.po_count += record.counter_of_po || 1;
             existing.total_price += record.price || 0;
-            existing.total_shipping_days += record.avg_shipping_days || 0;
+            existing.total_po_value += record.po_value || 0;
+            if (record.avg_shipping_days) {
+              existing.total_shipping_days += record.avg_shipping_days;
+              existing.records_with_shipping += 1;
+            }
             existing.records += 1;
           } else {
             vendorMap.set(key, {
-              vendor_name: record.vendor_name || "Unknown Vendor",
+              vendor_name: vendorName,
               vendor_code: record.vendor_code || "",
               po_count: record.counter_of_po || 1,
               total_price: record.price || 0,
+              total_po_value: record.po_value || 0,
               total_shipping_days: record.avg_shipping_days || 0,
+              records_with_shipping: record.avg_shipping_days ? 1 : 0,
               records: 1,
             });
           }
         });
 
-        const vendorSummaries: VendorSummary[] = Array.from(vendorMap.values()).map((v, idx) => ({
-          vendor_name: v.vendor_name,
-          vendor_code: v.vendor_code,
-          po_count: v.po_count,
-          avg_lead_time: formatLeadTime(v.total_shipping_days / v.records),
-          on_time_pct: Math.round(70 + Math.random() * 25), // Simulated - would need real data
-          avg_price: v.total_price / v.records,
-          is_current: idx === 0, // First vendor is current
-        }));
+        const vendorSummaries: VendorSummary[] = Array.from(vendorMap.values()).map((v, idx) => {
+          const avgShippingDays = v.records_with_shipping > 0 
+            ? v.total_shipping_days / v.records_with_shipping 
+            : 0;
+          return {
+            vendor_name: v.vendor_name,
+            vendor_code: v.vendor_code,
+            po_count: v.po_count,
+            avg_lead_time: formatLeadTime(avgShippingDays),
+            avg_shipping_days: avgShippingDays,
+            avg_price: v.records > 0 ? v.total_price / v.records : 0,
+            total_po_value: v.total_po_value,
+            is_current: idx === 0, // First vendor is current
+          };
+        });
+
+        // Sort by total PO value to show most used vendor first
+        vendorSummaries.sort((a, b) => b.total_po_value - a.total_po_value);
+        if (vendorSummaries.length > 0) {
+          vendorSummaries[0].is_current = true;
+          for (let i = 1; i < vendorSummaries.length; i++) {
+            vendorSummaries[i].is_current = false;
+          }
+        }
 
         setVendors(vendorSummaries);
 
-        // Build PO history
-        const poHistory: PORecord[] = data
-          .filter((r) => r.purchasing_document)
-          .map((record) => ({
-            po_number: record.purchasing_document || "",
-            vendor_name: record.vendor_name || "Unknown",
-            po_date: record.created_on,
-            gr_date: record.changed_on, // Using changed_on as proxy for GR date
-            on_time: Math.random() > 0.2, // Simulated - would need real data
-            lead_time: formatLeadTime(record.avg_shipping_days || 0),
-            quantity: record.po_quantity,
-            price: record.price,
-          }));
+        // Build PO history from all records
+        const poHistory: PORecord[] = data.map((record) => ({
+          id: record.id,
+          po_number: record.purchasing_document || "N/A",
+          vendor_name: record.company_created || record.vendor_name || "Unknown",
+          po_date: record.created_on,
+          gr_date: record.changed_on,
+          lead_time: formatLeadTime(record.avg_shipping_days || 0),
+          avg_shipping_days: record.avg_shipping_days,
+          quantity: record.po_quantity || record.quantity,
+          price: record.price,
+          po_value: record.po_value,
+        }));
 
         setPoRecords(poHistory);
+      } else {
+        setVendors([]);
+        setPoRecords([]);
       }
     } catch (error) {
       console.error("Error fetching related data:", error);
@@ -134,7 +170,7 @@ const PartDetailDialog = ({
     }
   };
 
-  const formatLeadTime = (days: number): string => {
+  const formatLeadTime = (days: number | null): string => {
     if (!days || days === 0) return "N/A";
     const weeks = Math.floor(days / 7);
     const remainingDays = Math.round(days % 7);
@@ -143,7 +179,7 @@ const PartDetailDialog = ({
     } else if (weeks > 0) {
       return `${weeks} week${weeks > 1 ? "s" : ""}`;
     }
-    return `${remainingDays} day${remainingDays > 1 ? "s" : ""}`;
+    return `${Math.round(days)} day${Math.round(days) > 1 ? "s" : ""}`;
   };
 
   const formatDate = (dateStr: string | null) => {
@@ -160,9 +196,15 @@ const PartDetailDialog = ({
     return `$${price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
+  const formatCurrency = (value: number | null) => {
+    if (value == null) return "N/A";
+    return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
   if (!part) return null;
 
   const stockQuantity = part.quantity || part.po_quantity || 0;
+  const vendorName = getVendorName(part);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -217,6 +259,30 @@ const PartDetailDialog = ({
                   </Badge>
                 )}
               </div>
+              {part.material_group && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Material Group</p>
+                  <p className="font-medium">{part.material_group}</p>
+                </div>
+              )}
+              {part.material_type && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Material Type</p>
+                  <p className="font-medium">{part.material_type}</p>
+                </div>
+              )}
+              {part.grade && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Grade</p>
+                  <p className="font-medium">{part.grade}</p>
+                </div>
+              )}
+              {part.division && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Division</p>
+                  <p className="font-medium">{part.division}</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -236,7 +302,7 @@ const PartDetailDialog = ({
                     <TableHead>Vendor</TableHead>
                     <TableHead className="text-center">PO Count</TableHead>
                     <TableHead className="text-center">⏱ Avg Lead Time</TableHead>
-                    <TableHead className="text-center">On-Time %</TableHead>
+                    <TableHead className="text-right">Total PO Value</TableHead>
                     <TableHead className="text-right">Avg Price</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -254,26 +320,17 @@ const PartDetailDialog = ({
                                 </Badge>
                               )}
                             </div>
-                            <span className="text-xs text-muted-foreground">
-                              {vendor.vendor_code}
-                            </span>
+                            {vendor.vendor_code && (
+                              <span className="text-xs text-muted-foreground">
+                                {vendor.vendor_code}
+                              </span>
+                            )}
                           </div>
                         </TableCell>
                         <TableCell className="text-center">{vendor.po_count}</TableCell>
                         <TableCell className="text-center">{vendor.avg_lead_time}</TableCell>
-                        <TableCell className="text-center">
-                          <Badge
-                            variant="outline"
-                            className={
-                              vendor.on_time_pct >= 80
-                                ? "border-emerald-500 text-emerald-600 bg-emerald-50"
-                                : vendor.on_time_pct >= 60
-                                ? "border-yellow-500 text-yellow-600 bg-yellow-50"
-                                : "border-red-500 text-red-600 bg-red-50"
-                            }
-                          >
-                            {vendor.on_time_pct}%
-                          </Badge>
+                        <TableCell className="text-right">
+                          {formatCurrency(vendor.total_po_value)}
                         </TableCell>
                         <TableCell className="text-right font-medium">
                           {formatPrice(vendor.avg_price)}
@@ -298,7 +355,7 @@ const PartDetailDialog = ({
               <FileText className="h-4 w-4" />
               Purchase Order History
               <span className="text-muted-foreground font-normal text-sm">
-                ({poRecords.length} PO{poRecords.length !== 1 ? "s" : ""})
+                ({poRecords.length} record{poRecords.length !== 1 ? "s" : ""})
               </span>
             </h3>
             <div className="border rounded-lg overflow-hidden">
@@ -308,36 +365,28 @@ const PartDetailDialog = ({
                     <TableHead>PO Number</TableHead>
                     <TableHead>Vendor</TableHead>
                     <TableHead className="text-center">PO Date</TableHead>
-                    <TableHead className="text-center">GR Date</TableHead>
-                    <TableHead className="text-center">On-Time</TableHead>
                     <TableHead className="text-center">Lead Time</TableHead>
                     <TableHead className="text-center">Qty</TableHead>
                     <TableHead className="text-right">Price</TableHead>
+                    <TableHead className="text-right">PO Value</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {poRecords.length > 0 ? (
-                    poRecords.map((po, idx) => (
-                      <TableRow key={idx}>
+                    poRecords.map((po) => (
+                      <TableRow key={po.id}>
                         <TableCell className="font-medium">{po.po_number}</TableCell>
                         <TableCell>{po.vendor_name}</TableCell>
                         <TableCell className="text-center">{formatDate(po.po_date)}</TableCell>
-                        <TableCell className="text-center">{formatDate(po.gr_date)}</TableCell>
-                        <TableCell className="text-center">
-                          {po.on_time ? (
-                            <Check className="h-5 w-5 text-emerald-500 mx-auto" />
-                          ) : (
-                            <X className="h-5 w-5 text-red-500 mx-auto" />
-                          )}
-                        </TableCell>
                         <TableCell className="text-center">{po.lead_time}</TableCell>
-                        <TableCell className="text-center">{po.quantity || "N/A"}</TableCell>
+                        <TableCell className="text-center">{po.quantity ?? "N/A"}</TableCell>
                         <TableCell className="text-right">{formatPrice(po.price)}</TableCell>
+                        <TableCell className="text-right">{formatCurrency(po.po_value)}</TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-4">
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-4">
                         {loading ? "Loading purchase orders..." : "No purchase order history"}
                       </TableCell>
                     </TableRow>
