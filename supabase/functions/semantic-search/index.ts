@@ -52,26 +52,31 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Create a summary of available parts for the AI
+    // Create a summary of available parts for the AI using fields that have actual data
     const partsSummary = allParts.slice(0, 100).map((p, i) => 
-      `${i + 1}. [${p.material_number}] ${p.description || 'No description'} | Material: ${p.basic_material || p.material_group || 'N/A'} | Size: ${p.size_dimension || 'N/A'} | Vendor: ${p.vendor_name || 'N/A'}`
+      `${i + 1}. [${p.material_number}] Category: ${p.material_group || 'N/A'} | Size: ${p.size_dimension || 'N/A'} | Vendor: ${p.company_created || 'N/A'} | Type: ${p.material_type || 'N/A'}`
     ).join('\n');
+
+    // Get unique categories for context
+    const categories = [...new Set(allParts.map(p => p.material_group).filter(Boolean))];
 
     const prompt = `You are an industrial parts search expert. A user is searching for parts using natural language.
 
 USER QUERY: "${query}"
 
+AVAILABLE CATEGORIES: ${categories.join(', ')}
+
 AVAILABLE PARTS (showing first 100):
 ${partsSummary}
 
 Based on the user's query, identify the 10-20 most relevant parts. Consider:
-- Semantic meaning of the query (e.g., "fasteners" should match bolts, screws, nuts)
-- Material requirements (e.g., "stainless" should match SS316, SS304, etc.)
-- Size/dimension matches
-- Use case context (e.g., "for piping" should match pipe fittings, flanges, etc.)
+- Category matching (e.g., "washers" or "bolts" → FASTENERS, "bearing" → BEARINGS, "hydraulic" → HYDRAULICS, "seal" → SEALS, "gear" → GEARS)
+- Size/dimension matches (e.g., "25MM" should match parts with 25MM in size_dimension)
+- Vendor/company matches (e.g., "atlas" should match Atlas Copco parts)
+- Material type matches (e.g., "ZFAB", "ZRAW", etc.)
 
-Return a JSON array of the matching part numbers in order of relevance:
-["MAT001", "MAT002", ...]
+Return a JSON array of the matching material_number values in order of relevance:
+["1319149732", "1319149733", ...]
 
 Only return the JSON array, no other text.`;
 
