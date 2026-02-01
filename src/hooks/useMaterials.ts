@@ -3,10 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { PartsDataRow } from "@/types/partsData";
 
 const SEARCHABLE_FIELDS = [
-  "material_number", "description", "material_group", "basic_material", 
-  "vendor_name", "size_dimension", "grade", "division", "ext_material_group", 
-  "material_type", "location", "vendor_code", "business_partner", 
-  "purchasing_org", "organizational_unit"
+  "material_number",
+  "material_group", 
+  "size_dimension",
+  "company_created",
+  "material_type",
+  "purchasing_org",
+  "vendor_code",
+  "created_by",
+  "purchasing_document"
 ];
 
 const buildSearchFilter = (term: string): string => {
