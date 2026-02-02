@@ -12,7 +12,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const CORRECT_PASSWORD = "GARNETATLAS";
+const CORRECT_PASSWORD = "GARNET2026";
 const AUTH_KEY = "quidi_auth";
 
 export const useAuth = () => {
